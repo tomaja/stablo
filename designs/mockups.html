@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="sr-Latn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Predlozi dizajna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Three design directions for the person page (Dmitar Knežević), as phone screens. Static mockups: not wired to data. */
+* { box-sizing: border-box; margin: 0; }
+html, body { background: #d9dcd6; }
+body { display: flex; gap: 40px; justify-content: center; align-items: flex-start; padding: 40px; font-family: system-ui, sans-serif; }
+.phone { width: 390px; height: 844px; border-radius: 44px; overflow: hidden; position: relative; flex: none; }
+.solo body, body.solo { padding: 0; gap: 0; background: none; }
+body.solo .phone { border-radius: 0; }
+body.solo .phone:not(.show) { display: none; }
+
+/* ---------- 1. Arhiv: archival, editorial ---------- */
+.a { background: #f3ede2; color: #2b2219; font-family: "Cormorant Garamond", Georgia, serif; }
+.a .top { display: flex; align-items: center; justify-content: space-between; padding: 54px 24px 14px; font: 500 12px/1 "DM Sans", sans-serif; letter-spacing: .22em; text-transform: uppercase; color: #7a6a58; border-bottom: 1px solid #d8cbb6; }
+.a .top b { font-weight: 500; color: #2b2219; }
+.a .hero { text-align: center; padding: 26px 28px 18px; }
+.a .mono { width: 92px; height: 92px; margin: 0 auto; border-radius: 50%; border: 1px solid #8a2f1d; outline: 1px solid #8a2f1d; outline-offset: 4px; display: grid; place-items: center; font: italic 500 36px/1 "Cormorant Garamond", serif; color: #8a2f1d; }
+.a h1 { font: 500 40px/1.05 "Cormorant Garamond", serif; margin-top: 20px; letter-spacing: -.01em; }
+.a .role { font: italic 400 19px/1.3 "Cormorant Garamond", serif; color: #6b5a47; margin-top: 6px; }
+.a .gen { display: flex; align-items: center; gap: 10px; justify-content: center; margin-top: 14px; font: 500 11px/1 "DM Sans", sans-serif; letter-spacing: .2em; text-transform: uppercase; color: #8a2f1d; }
+.a .gen::before, .a .gen::after { content: ""; width: 34px; height: 1px; background: #c9b79c; }
+.a .sec { padding: 14px 28px 0; }
+.a h2 { font: 500 11px/1 "DM Sans", sans-serif; letter-spacing: .2em; text-transform: uppercase; color: #7a6a58; padding-bottom: 8px; border-bottom: 1px solid #d8cbb6; display: flex; justify-content: space-between; }
+.a .lin { list-style: none; padding: 6px 0 0; }
+.a .lin li { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; padding: 4px 0; font-size: 18px; }
+.a .lin i { font: italic 500 15px "Cormorant Garamond", serif; color: #a08a6e; }
+.a .lin span { font-variant-numeric: oldstyle-nums; color: #7a6a58; font-size: 17px; }
+.a .lin li.me { color: #8a2f1d; font-weight: 600; }
+.a .ledger { list-style: none; padding: 4px 0 0; }
+.a .ledger li { display: grid; grid-template-columns: 52px 1fr 14px; gap: 6px; padding: 9px 0; border-bottom: 1px dotted #cdbda4; align-items: baseline; }
+.a .ledger .y { font: 500 18px "Cormorant Garamond", serif; font-variant-numeric: oldstyle-nums; color: #8a2f1d; }
+.a .ledger b { font: 500 20px/1.1 "Cormorant Garamond", serif; }
+.a .ledger small { display: block; font: italic 15px/1.3 "Cormorant Garamond", serif; color: #7a6a58; }
+.a .ledger em { font-style: normal; color: #a08a6e; font-size: 18px; }
+.a .spouse { font-size: 18px; padding: 8px 0 2px; }
+.a .spouse small { font-style: italic; color: #7a6a58; }
+.a .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; padding-bottom: 22px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #d8cbb6; background: #f3ede2; font: 500 12px "DM Sans", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: #7a6a58; }
+.a .nav .on { color: #8a2f1d; }
+
+/* ---------- 2. Krošnja: botanical, rounded, friendly ---------- */
+.k { background: #eef2ea; color: #1e3a2a; font-family: "DM Sans", sans-serif; }
+.k .top { display: flex; gap: 10px; padding: 54px 18px 12px; align-items: center; }
+.k .search { flex: 1; height: 44px; border-radius: 22px; background: #fff; display: flex; align-items: center; gap: 10px; padding: 0 16px; color: #7d8f80; font-size: 14px; }
+.k .icon { width: 44px; height: 44px; border-radius: 50%; background: #fff; display: grid; place-items: center; }
+.k .card { margin: 6px 18px 0; border-radius: 28px; background: #fff; padding: 18px; }
+.k .head { display: flex; gap: 14px; align-items: center; }
+.k .blob { width: 64px; height: 64px; border-radius: 42% 58% 48% 52% / 55% 45% 55% 45%; background: #cfe3c8; color: #1e3a2a; display: grid; place-items: center; font: 600 22px "Fraunces", serif; flex: none; }
+.k h1 { font: 500 27px/1.05 "Fraunces", serif; letter-spacing: -.01em; }
+.k .sub { color: #5d7262; font-size: 14px; margin-top: 3px; }
+.k .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.k .chip { font-size: 12.5px; font-weight: 500; padding: 6px 11px; border-radius: 999px; background: #eef4ea; color: #2f5a3c; }
+.k .chip.t { background: #fbe9df; color: #9a4a22; }
+.k .acts { display: flex; gap: 8px; margin-top: 14px; }
+.k .btn { flex: 1; height: 42px; border-radius: 21px; display: grid; place-items: center; font-size: 14px; font-weight: 600; background: #eef4ea; color: #1e3a2a; }
+.k .btn.p { background: #1e3a2a; color: #fff; }
+.k h2 { font: 500 18px "Fraunces", serif; margin: 18px 24px 8px; display: flex; justify-content: space-between; align-items: baseline; }
+.k h2 small { font: 500 12px "DM Sans", sans-serif; color: #7d8f80; }
+.k .branch { position: relative; margin: 0 18px 0 30px; padding-left: 26px; }
+.k .branch::before { content: ""; position: absolute; left: 0; top: -6px; bottom: 26px; width: 3px; border-radius: 3px; background: #9cc39a; }
+.k .leaf { position: relative; background: #fff; border-radius: 18px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.k .leaf::before { content: ""; position: absolute; left: -26px; top: 50%; width: 22px; height: 16px; border: 3px solid #9cc39a; border-top: 0; border-right: 0; border-bottom-left-radius: 14px; transform: translateY(-100%); }
+.k .leaf .d { width: 10px; height: 10px; border-radius: 50%; background: #5b8a5e; flex: none; }
+.k .leaf.f .d { background: #c66b3d; }
+.k .leaf b { font-weight: 600; font-size: 15px; }
+.k .leaf small { display: block; color: #6c7f70; font-size: 12.5px; }
+.k .leaf .n { margin-left: auto; font-size: 12px; font-weight: 600; color: #2f5a3c; background: #eef4ea; border-radius: 999px; padding: 4px 9px; }
+.k .twigs { display: flex; gap: 6px; margin: -2px 0 8px 14px; flex-wrap: wrap; }
+.k .twig { font-size: 12px; padding: 5px 10px; border-radius: 999px; background: #dcebd6; color: #2f5a3c; }
+.k .tabs { position: absolute; left: 18px; right: 18px; bottom: 26px; height: 64px; border-radius: 32px; background: #1e3a2a; display: flex; justify-content: space-around; align-items: center; color: #b9d1bb; font-size: 11.5px; }
+.k .tabs span { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.k .tabs .on { color: #fff; }
+.k .tabs .on svg { background: #3d6b4b; border-radius: 12px; padding: 4px 12px; box-sizing: content-box; }
+
+/* ---------- 3. Sazvežđe: dark, data-forward ---------- */
+.s { background: #0b1020; color: #e8ecf8; font-family: "Space Grotesk", sans-serif; }
+.s .top { display: flex; align-items: center; justify-content: space-between; padding: 56px 20px 8px; }
+.s .brand { font: 600 15px "Space Grotesk", sans-serif; letter-spacing: .02em; }
+.s .brand span { color: #5ad1e8; }
+.s .seg { display: flex; background: #151c33; border-radius: 999px; padding: 3px; font-size: 12.5px; }
+.s .seg span { padding: 6px 12px; border-radius: 999px; color: #8a93b0; }
+.s .seg .on { background: #263052; color: #e8ecf8; }
+.s .who { padding: 6px 20px 0; }
+.s .who small { font: 500 11px "JetBrains Mono", monospace; letter-spacing: .12em; color: #8a93b0; text-transform: uppercase; }
+.s h1 { font: 500 30px/1.1 "Space Grotesk", sans-serif; letter-spacing: -.02em; margin-top: 4px; }
+.s .meta { color: #8a93b0; font-size: 14px; margin-top: 2px; }
+.s svg.sun { display: block; margin: 4px auto 0; }
+.s .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 20px; }
+.s .tile { background: #131a2e; border: 1px solid #1f2843; border-radius: 16px; padding: 10px 12px; }
+.s .tile b { display: block; font: 500 22px "Space Grotesk", sans-serif; }
+.s .tile span { font-size: 12px; color: #8a93b0; }
+.s .time { margin: 14px 20px 0; background: #131a2e; border: 1px solid #1f2843; border-radius: 16px; padding: 12px 14px 14px; }
+.s .time small { font: 500 11px "JetBrains Mono", monospace; letter-spacing: .12em; color: #8a93b0; text-transform: uppercase; }
+.s .axis { position: relative; height: 46px; margin-top: 10px; }
+.s .axis::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: linear-gradient(90deg, #263052, #5ad1e8); }
+.s .pt { position: absolute; top: 4px; transform: translateX(-50%); text-align: center; font-size: 11.5px; color: #c4cbe0; white-space: nowrap; }
+.s .pt::before { content: ""; display: block; width: 12px; height: 12px; border-radius: 50%; background: #0b1020; border: 2px solid #5ad1e8; margin: 0 auto 6px; }
+.s .pt.me::before { background: #5ad1e8; box-shadow: 0 0 0 5px #5ad1e833; }
+.s .pt span { display: block; font: 10.5px "JetBrains Mono", monospace; color: #8a93b0; }
+.s .dock { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; padding-bottom: 22px; display: flex; justify-content: space-around; align-items: center; background: #0e1427; border-top: 1px solid #1f2843; color: #8a93b0; font-size: 11.5px; }
+.s .dock span { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.s .dock .on { color: #5ad1e8; }
+</style>
+</head>
+<body>
+
+<!-- 1. Arhiv -->
+<section class="phone a" id="d1">
+  <div class="top"><span>‹ Nazad</span><b>Rodoslov</b><span>Traži</span></div>
+  <div class="hero">
+    <div class="mono">DK</div>
+    <h1>Dmitar Knežević</h1>
+    <p class="role">zemljoradnik, rođen 1897.</p>
+    <p class="gen">Peta generacija</p>
+  </div>
+  <div class="sec">
+    <h2>Loza<span>od 1750.</span></h2>
+    <ol class="lin">
+      <li><i>I</i>Petar „Peš”<span>1750</span></li>
+      <li><i>II</i>Sava<span>1794</span></li>
+      <li><i>III</i><span style="color:inherit;font-size:18px">Miloš <small style="font-style:italic;color:#7a6a58;font-size:16px">∞ Manda</small></span><span>1824</span></li>
+      <li><i>IV</i>Vučen<span>1860</span></li>
+      <li class="me"><i>V</i>Dmitar<span>1897</span></li>
+    </ol>
+  </div>
+  <div class="sec">
+    <h2>Supružnica</h2>
+    <p class="spouse">Smiljana r. Knežević <small>— rođena 1897.</small></p>
+  </div>
+  <div class="sec">
+    <h2>Deca<span>četvoro</span></h2>
+    <ul class="ledger">
+      <li><span class="y">1920</span><span><b>Rade</b><small>radnik; poginuo 1944. kod Knina</small></span><em>›</em></li>
+      <li><span class="y">1929</span><span><b>Zorka</b><small>umrla</small></span><em>›</em></li>
+      <li><span class="y">1931</span><span><b>Draginja</b><small>žrtva fašističkog terora</small></span><em>›</em></li>
+      <li><span class="y">1933</span><span><b>Gojko</b><small>radnik, Mali Cvjetnić · troje dece</small></span><em>›</em></li>
+    </ul>
+  </div>
+  <nav class="nav"><span class="on">Osoba</span><span>Preci</span><span>Potomci</span><span>Stablo</span></nav>
+</section>
+
+<!-- 2. Krošnja -->
+<section class="phone k" id="d2">
+  <div class="top">
+    <div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg>Pretraži 4.225 osoba</div>
+    <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e3a2a" stroke-width="2"><path d="M12 3v18M12 8l-5-3M12 12l6-4M12 16l-6-3"/></svg></div>
+  </div>
+  <div class="card">
+    <div class="head"><div class="blob">DK</div><div><h1>Dmitar Knežević</h1><p class="sub">sin Vučena · otac četvoro dece</p></div></div>
+    <div class="chips"><span class="chip">rođ. 1897.</span><span class="chip">zemljoradnik</span><span class="chip">5. generacija</span><span class="chip t">8 potomaka</span></div>
+    <div class="acts"><span class="btn p">Vidi u stablu</span><span class="btn">Predloži izmenu</span></div>
+  </div>
+  <h2>Grana <small>deca i unuci</small></h2>
+  <div class="branch">
+    <div class="leaf"><span class="d"></span><span><b>Rade</b><small>1920 · radnik · poginuo 1944.</small></span></div>
+    <div class="leaf f"><span class="d"></span><span><b>Zorka</b><small>1929</small></span></div>
+    <div class="leaf f"><span class="d"></span><span><b>Draginja</b><small>1931</small></span></div>
+    <div class="leaf"><span class="d"></span><span><b>Gojko</b><small>1933 · radnik · Mali Cvjetnić</small></span><span class="n">+4</span></div>
+    <div class="twigs"><span class="twig">Gordana 1964</span><span class="twig">Biljana 1965</span><span class="twig">Nevena 1966</span></div>
+  </div>
+  <nav class="tabs">
+    <span class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M12 8l-5-3M12 12l6-4M12 16l-6-3"/></svg>Stablo</span>
+    <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Osobe</span>
+    <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg>Traži</span>
+    <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14"/></svg>Dodaj</span>
+  </nav>
+</section>
+
+<!-- 3. Sazvežđe -->
+<section class="phone s" id="d3">
+  <div class="top"><span class="brand">rodoslov<span>.</span></span><div class="seg"><span class="on">Potomci</span><span>Preci</span></div></div>
+  <div class="who"><small>Knežević · 5. generacija</small><h1>Dmitar Knežević</h1><p class="meta">1897 · zemljoradnik</p></div>
+  <svg class="sun" id="sun" width="330" height="330" viewBox="-165 -165 330 330"></svg>
+  <div class="tiles"><div class="tile"><b>4</b><span>dece</span></div><div class="tile"><b>3</b><span>unuka</span></div><div class="tile"><b>1</b><span>praunuk</span></div></div>
+  <div class="time"><small>Loza kroz vreme</small>
+    <div class="axis">
+      <span class="pt" style="left:6%">Petar<span>1750</span></span>
+      <span class="pt" style="left:30%">Sava<span>1794</span></span>
+      <span class="pt" style="left:51%">Miloš<span>1824</span></span>
+      <span class="pt" style="left:72%">Vučen<span>1860</span></span>
+      <span class="pt me" style="left:93%">Dmitar<span>1897</span></span>
+    </div>
+  </div>
+  <nav class="dock">
+    <span class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Krug</span>
+    <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Lista</span>
+    <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg>Traži</span>
+  </nav>
+</section>
+
+<script>
+// ?d=1|2|3 shows one design alone at phone size (used for the screenshots)
+const d = new URLSearchParams(location.search).get('d');
+if (d) { document.body.classList.add('solo'); document.getElementById('d' + d).classList.add('show'); }
+
+// descendant sunburst for design 3: rings are generations, arc width follows the number of descendants
+const tree = { n: 'Dmitar', y: 1897, k: [
+  { n: 'Rade', y: 1920 }, { n: 'Zorka', y: 1929 }, { n: 'Draginja', y: 1931 },
+  { n: 'Gojko', y: 1933, k: [{ n: 'Gordana', y: 1964 }, { n: 'Biljana', y: 1965, k: [{ n: 'Radovan', y: 1986 }] }, { n: 'Nevena', y: 1966 }] }
+] };
+const size = t => (t.size = 1 + (t.k || []).reduce((s, c) => s + size(c), 0));
+size(tree);
+const ring = [[46, 92], [96, 132], [136, 160]];
+const colors = ['#5ad1e8', '#a78bfa', '#f5b85a'];
+const svg = document.getElementById('sun');
+const P = (r, a) => [r * Math.sin(a), -r * Math.cos(a)];
+let out = `<circle r="42" fill="#5ad1e8"/><text text-anchor="middle" y="-2" fill="#0b1020" font-size="15" font-weight="600" font-family="Space Grotesk">Dmitar</text><text text-anchor="middle" y="15" fill="#0b1020" font-size="11" font-family="JetBrains Mono">1897</text>`;
+function arcs(t, depth, a0, a1) {
+  const kids = t.k || []; const total = kids.reduce((s, c) => s + c.size, 0);
+  let a = a0;
+  for (const c of kids) {
+    const span = (a1 - a0) * c.size / total, b = a + span, [r0, r1] = ring[depth];
+    const pad = 0.012, s = a + pad, e = b - pad, big = e - s > Math.PI ? 1 : 0;
+    const [x0, y0] = P(r1, s), [x1, y1] = P(r1, e), [x2, y2] = P(r0, e), [x3, y3] = P(r0, s);
+    out += `<path d="M${x0},${y0} A${r1},${r1} 0 ${big} 1 ${x1},${y1} L${x2},${y2} A${r0},${r0} 0 ${big} 0 ${x3},${y3} Z" fill="${colors[depth]}"/>`;
+    const mid = (s + e) / 2, rm = (r0 + r1) / 2, [tx, ty] = P(rm, mid);
+    // outer rings: names run along the arc, flipped on the lower half so they never read upside down
+    let rot = ((mid * 180 / Math.PI) % 360 + 360) % 360; if (rot > 90 && rot < 270) rot -= 180;
+    const fs = depth === 0 ? 12.5 : 10.5;
+    out += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${depth === 0 ? 0 : rot} ${tx} ${ty})" fill="#0b1020" font-size="${fs}" font-weight="600" font-family="Space Grotesk">${c.n}</text>`;
+    arcs(c, depth + 1, a, b);
+    a = b;
+  }
+}
+arcs(tree, 0, -Math.PI * 0.5, Math.PI * 1.5);
+svg.innerHTML = out;
+</script>
+</body>
+</html>

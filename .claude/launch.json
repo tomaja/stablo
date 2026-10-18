@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "site",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "site"],
+      "port": 8765
+    },
+    {
+      "name": "site-8768",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8768", "--directory", "site"],
+      "port": 8768,
+      "autoPort": false
+    }
+  ]
+}
