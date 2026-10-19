@@ -319,7 +319,9 @@ def main():
     (ROOT / "site").mkdir(exist_ok=True)
     full = ('<!doctype html>\n<html lang="sr-Latn">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-            + page.replace("__PHONE_URL__", '"telefon.html"') + "\n</html>\n")
+            # explicit <body> tags: Cloudflare Web Analytics only injects its script into a real body element
+            + page.replace("__PHONE_URL__", '"telefon.html"').replace('<div class="app">', '</head>\n<body>\n<div class="app">', 1)
+            + "\n</body>\n</html>\n")
     (ROOT / "site" / "index.html").write_text(full, encoding="utf-8")
 
     # phone view: same data, one person per screen; it opens the main page for editing (?full) and for the disk (?view=tree)
