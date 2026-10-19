@@ -320,7 +320,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .ptree .pk2 { font-family: var(--f-mono); fill: var(--p-muted); letter-spacing: .08em; }
 .sheet .pbody.tile { outline: .25mm dashed var(--p-box); outline-offset: 0; }
 .ptree .pg { font-family: var(--f-mono); fill: var(--p-muted); letter-spacing: .04em; }
-#printOut { display: none; }
 .popts { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; margin: 0; }
 .popts .fld { min-width: 140px; }
 .popts .chk { display: flex; align-items: center; gap: 8px; font-size: 13.5px; padding-bottom: 9px; cursor: pointer; }
@@ -329,14 +328,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .pprev { background: var(--line); border-radius: 8px; padding: 12px; max-height: min(56vh, 640px); overflow: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .pprev .sheet { zoom: var(--z, .5); flex: none; box-shadow: 0 2px 12px rgba(0, 0, 0, .28); }
 .hint { margin: 0; font-size: 12.5px; color: var(--muted); max-width: 70ch; }
-@media print {
-  html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
-  body.printing > :not(#printOut) { display: none !important; }
-  body.printing #printOut { display: block; }
-  #printOut .sheet { break-after: page; }
-  #printOut .sheet:last-child { break-after: auto; }
-  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-}
 </style>
 
 <div class="app">
@@ -426,12 +417,12 @@ const T = {
     delOnly: (n, up) => up ? `Samo ovu osobu. ${n === 1 ? 'Dete se premešta' : 'Deca (' + n + ') se premeštaju'} pod:`
       : `Samo ovu osobu. ${n === 1 ? 'Dete postaje začetnik loze.' : 'Deca (' + n + ') postaju začetnici loza.'}`,
     delAll: n => `Ovu osobu i sve potomke (ukupno ${fmt(n)} osoba)`,
-    pdf: 'Preuzmi pdf', print: 'Štampaj', printTitle: 'Štampanje', paper: 'Papir', orient: 'Položaj', landscape: 'Položeno', portrait: 'Uspravno',
+    pdf: 'Preuzmi pdf', print: 'Preuzmi', printTitle: 'Preuzimanje', making: 'Pravi se PDF…', paper: 'Papir', orient: 'Položaj', landscape: 'Položeno', portrait: 'Uspravno',
     printLede: 'Preci izabrane osobe i svi njeni potomci, složeni po generacijama s leva na desno.',
     spouses: 'Prikaži supružnike', printDoc: 'Preci i potomci', printCount: (a, d) => `preci: ${a} · potomci: ${fmt(d)}`,
     pages: n => `${n} ${n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'strane' : 'strana'}`,
     pageOf: (i, n) => `Strana ${i} od ${n}`, genShort: g => `${g}. generacija`,
-    printHint: 'U prozoru za štampu izaberite isti papir, razmeru 100% (bez prilagođavanja) i isključite zaglavlja i podnožja.',
+    printHint: 'PDF se preuzima u izabranoj veličini papira. Za štampu ga otvorite i štampajte u razmeri 100%.',
     ledeDown: 'Prvi predak je na vrhu, svaka generacija je red niže, a izabrana osoba i svi njeni potomci se granaju ispod.',
     ledeTree: 'Prvi predak je koren, preci čine stablo do izabrane osobe, a njeni potomci su krošnja. Staje na jedan list.',
     nodes: 'Čvorovi', nodePill: 'Imena u čvorovima', nodeDot: 'Male tačke',
@@ -480,12 +471,12 @@ const T = {
     delOnly: (n, up) => up ? `Only this person. ${n === 1 ? 'Their child moves' : 'Their ' + n + ' children move'} under:`
       : `Only this person. ${n === 1 ? 'Their child becomes the founder of a line.' : 'Their ' + n + ' children become founders of their own lines.'}`,
     delAll: n => `This person and all descendants (${fmt(n)} people in total)`,
-    pdf: 'Download PDF', print: 'Print', printTitle: 'Print', paper: 'Paper', orient: 'Orientation', landscape: 'Landscape', portrait: 'Portrait',
+    pdf: 'Download PDF', print: 'Download', printTitle: 'Download', making: 'Making the PDF…', paper: 'Paper', orient: 'Orientation', landscape: 'Landscape', portrait: 'Portrait',
     printLede: 'The selected person’s ancestors and all of their descendants, laid out by generation from left to right.',
     spouses: 'Show spouses', printDoc: 'Ancestors and descendants', printCount: (a, d) => `ancestors: ${a} · descendants: ${fmt(d)}`,
     pages: n => `${n} ${n === 1 ? 'page' : 'pages'}`,
     pageOf: (i, n) => `Page ${i} of ${n}`, genShort: g => `Generation ${g}`,
-    printHint: 'In the print dialog choose the same paper, 100% scale (no fit to page), and turn off headers and footers.',
+    printHint: 'The PDF downloads in the chosen paper size. To print it, open it and print at 100% scale.',
     ledeDown: 'The first ancestor is at the top, each generation one row lower, with the selected person and all of their descendants branching below.',
     ledeTree: 'The first ancestor is the root, the ancestors form the trunk up to the selected person, and their descendants are the crown. Fits on one sheet.',
     nodes: 'Nodes', nodePill: 'Names inside nodes', nodeDot: 'Small dots',
@@ -1744,7 +1735,112 @@ function buildPrint(p, o) {
   const count = [t('pages')(L.tiles.length), poster ? t('tiled')(L.tiles.length, L.nrow, L.ncol) : '', L.scale < 0.55 ? t('tinyType') : ''].filter(Boolean).join(' · ');
   return { pw: L.pw, ph: L.ph, html: treeSheetsHtml(L), count, poster };
 }
-let pageStyle = null;
+/* PDF download, made in the browser: each sheet is laid out off screen at full size and drawn onto a canvas at
+   print resolution (its pictures as SVG images carrying the page's fonts, its text with the page's own fonts),
+   and every canvas becomes one page of a PDF in the chosen paper size. jsPDF loads only when it is needed. */
+const JSPDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+const PDF_FONTS = ['500 12px Spectral', '600 12px Spectral', 'italic 400 12px Spectral', '400 12px "Instrument Sans"', '400 12px "IBM Plex Mono"', '500 12px "IBM Plex Mono"'];
+let jsPdfReady = null, fontCssReady = null;
+const loadJsPdf = () => jsPdfReady || (jsPdfReady = new Promise((ok, fail) => {
+  const sc = document.createElement('script');
+  sc.src = JSPDF_URL;
+  sc.onload = () => ok(window.jspdf.jsPDF);
+  sc.onerror = () => { jsPdfReady = null; fail(new Error('jsPDF did not load')); };
+  document.head.appendChild(sc);
+}));
+// the web fonts (latin and latin-ext only) as data URIs, so they also work inside an SVG drawn onto a canvas
+const embeddedFonts = () => fontCssReady || (fontCssReady = (async () => {
+  const link = document.querySelector('link[href*="fonts.googleapis.com/css2"]');
+  if (!link) return '';
+  const css = await (await fetch(link.href)).text();
+  let keep = css.split(/(?=\/\*\s*[\w-]+\s*\*\/)/).filter(b => /^\/\*\s*latin(-ext)?\s*\*\//.test(b)).join('\n');
+  const urls = [...new Set([...keep.matchAll(/url\((https:[^)]+)\)/g)].map(m => m[1]))];
+  const data = await Promise.all(urls.map(async u => {
+    const b = await (await fetch(u)).blob();
+    return new Promise(res => { const fr = new FileReader(); fr.onload = () => res([u, fr.result]); fr.readAsDataURL(b); });
+  }));
+  for (const [u, d] of data) keep = keep.split(u).join(d);
+  return keep;
+})().catch(err => { fontCssReady = null; console.warn('fonts were not embedded in the PDF', err); return ''; }));
+const SVG_PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'stroke-opacity',
+  'opacity', 'font-family', 'font-size', 'font-weight', 'font-style', 'letter-spacing', 'paint-order', 'text-anchor'];
+// an SVG from the page as a standalone image: the page's CSS copied onto every element, fonts embedded
+function svgImage(el, fontCss, w, h) {
+  const clone = el.cloneNode(true), from = [el, ...el.querySelectorAll('*')], to = [clone, ...clone.querySelectorAll('*')];
+  from.forEach((src, i) => { const cs = getComputedStyle(src); to[i].setAttribute('style', SVG_PROPS.map(k => `${k}:${cs.getPropertyValue(k)}`).join(';')); });
+  clone.setAttribute('width', w); clone.setAttribute('height', h);
+  if (fontCss) { const st = document.createElementNS('http://www.w3.org/2000/svg', 'style'); st.textContent = fontCss; clone.insertBefore(st, clone.firstChild); }
+  const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)], { type: 'image/svg+xml' }));
+  return new Promise((ok, fail) => {
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); ok(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); fail(new Error('a picture could not be drawn')); };
+    img.src = url;
+  });
+}
+async function sheetCanvas(sheet, pw, ph, dpi, fontCss) {
+  const cv = document.createElement('canvas');
+  cv.width = Math.round(pw / 25.4 * dpi); cv.height = Math.round(ph / 25.4 * dpi);
+  const g = cv.getContext('2d');
+  g.fillStyle = '#ffffff'; g.fillRect(0, 0, cv.width, cv.height);
+  const box = sheet.getBoundingClientRect(), k = cv.width / box.width;    // canvas pixels per laid-out CSS pixel
+  const X = v => (v - box.left) * k, Y = v => (v - box.top) * k;
+  // pictures (the trees)
+  for (const svg of sheet.querySelectorAll('svg')) {
+    if (svg.parentElement.closest('svg')) continue;
+    const r = svg.getBoundingClientRect();
+    g.drawImage(await svgImage(svg, fontCss, r.width * k, r.height * k), X(r.left), Y(r.top), r.width * k, r.height * k);
+  }
+  // rules under the header, above the footer and around poster tiles
+  for (const el of sheet.querySelectorAll('.ph, .pf, .pbody.tile')) {
+    const cs = getComputedStyle(el), r = el.getBoundingClientRect();
+    const line = (w, color, x1, y1, x2, y2, dash) => { g.save(); g.strokeStyle = color; g.lineWidth = w * k; g.setLineDash(dash ? [w * 3 * k, w * 2 * k] : []); g.beginPath(); g.moveTo(X(x1), Y(y1)); g.lineTo(X(x2), Y(y2)); g.stroke(); g.restore(); };
+    const bb = parseFloat(cs.borderBottomWidth), bt = parseFloat(cs.borderTopWidth), ow = parseFloat(cs.outlineWidth);
+    if (bb) line(bb, cs.borderBottomColor, r.left, r.bottom - bb / 2, r.right, r.bottom - bb / 2);
+    if (bt) line(bt, cs.borderTopColor, r.left, r.top + bt / 2, r.right, r.top + bt / 2);
+    if (ow && cs.outlineStyle !== 'none') {
+      g.save(); g.strokeStyle = cs.outlineColor; g.lineWidth = ow * k; g.setLineDash([ow * 3 * k, ow * 2 * k]);
+      g.strokeRect(X(r.left), Y(r.top), r.width * k, r.height * k); g.restore();
+    }
+  }
+  // text outside the pictures: every text node is one line in these sheets
+  const walk = document.createTreeWalker(sheet, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement.closest('svg') || !n.textContent.trim() ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+  const range = document.createRange();
+  for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+    const cs = getComputedStyle(n.parentElement);
+    range.selectNodeContents(n);
+    const r = range.getClientRects()[0];
+    if (!r) continue;
+    let text = n.textContent.replace(/\s+/g, ' ').trim();
+    if (cs.textTransform === 'uppercase') text = text.toUpperCase();
+    g.font = `${cs.fontStyle} ${cs.fontWeight} ${parseFloat(cs.fontSize) * k}px ${cs.fontFamily}`;
+    if ('letterSpacing' in g) g.letterSpacing = `${(parseFloat(cs.letterSpacing) || 0) * k}px`;
+    g.fillStyle = cs.color; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    const m = g.measureText(text), asc = m.fontBoundingBoxAscent ?? m.actualBoundingBoxAscent, desc = m.fontBoundingBoxDescent ?? m.actualBoundingBoxDescent;
+    g.fillText(text, X(r.left), Y(r.top) + (r.height * k - (asc + desc)) / 2 + asc);
+  }
+  return cv;
+}
+async function downloadPdf(L, p, onPage) {
+  const [JsPDF, fontCss] = await Promise.all([loadJsPdf(), embeddedFonts(), ...PDF_FONTS.map(f => document.fonts.load(f, 'AaČćĐđŠšŽž09'))]);
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-30000px;top:0;';
+  host.innerHTML = L.html;
+  document.body.appendChild(host);
+  try {
+    // about 300 dpi, a little less on A3 so one page stays within what phones allow for a canvas
+    const dpi = Math.min(300, Math.floor(Math.sqrt(14e6 / (L.pw * L.ph / 645.16))));
+    const orient = L.pw > L.ph ? 'l' : 'p';
+    const doc = new JsPDF({ orientation: orient, unit: 'mm', format: [L.pw, L.ph], compress: true });
+    const sheets = host.querySelectorAll('.sheet');
+    for (let i = 0; i < sheets.length; i++) {
+      if (onPage) { onPage(i + 1, sheets.length); await new Promise(r => setTimeout(r, 0)); }   // let the button repaint
+      if (i) doc.addPage([L.pw, L.ph], orient);
+      doc.addImage(await sheetCanvas(sheets[i], L.pw, L.ph, dpi, fontCss), 'PNG', 0, 0, L.pw, L.ph, undefined, 'FAST');
+    }
+    doc.save(`${CFG.short} - ${plainName(p)}`.replace(/[\\/:*?"<>|„”]/g, '').replace(/\s+/g, ' ').trim() + '.pdf');
+  } finally { host.remove(); }
+}
 function openPrint(p) {
   const opt = (v, l, cur) => `<option value="${v}"${v === cur ? ' selected' : ''}>${esc(l)}</option>`;
   dPrint.innerHTML = `<div class="dlg-in">
@@ -1761,6 +1857,7 @@ function openPrint(p) {
     </form>
     <div class="pprev" id="pPrev"></div>
     <p class="hint">${esc(t('printHint'))} <span id="pTileHint">${esc(t('tileHint'))}</span></p>
+    <p class="msg err" id="pErr" role="alert" hidden></p>
     <div class="dlg-f"><button type="button" class="btn" data-close>${esc(t('cancel'))}</button><button type="button" class="btn primary" data-print>${esc(t('print'))}</button></div>
   </div>`;
   const form = dPrint.querySelector('form'), prev = document.getElementById('pPrev');
@@ -1781,23 +1878,20 @@ function openPrint(p) {
     try { localStorage.setItem('stablo.print', JSON.stringify(printOpts)); } catch (e) {}
     render();
   });
-  dPrint.querySelector('[data-print]').addEventListener('click', () => {
-    let out = document.getElementById('printOut');
-    if (!out) { out = document.createElement('div'); out.id = 'printOut'; document.body.appendChild(out); }
-    out.innerHTML = L.html;
-    if (!pageStyle) { pageStyle = document.createElement('style'); document.head.appendChild(pageStyle); }
-    pageStyle.textContent = `@page { size: ${L.pw}mm ${L.ph}mm; margin: 0; }`;
-    document.body.classList.add('printing');
-    dPrint.close();
-    setTimeout(() => window.print(), 60);
+  const go = dPrint.querySelector('[data-print]'), err = document.getElementById('pErr');
+  go.addEventListener('click', async () => {
+    go.disabled = true; go.textContent = t('making'); err.hidden = true;
+    try {
+      await downloadPdf(L, p, (i, n) => { if (n > 1) go.textContent = `${t('making')} ${i}/${n}`; });
+      dPrint.close();
+    } catch (e) {
+      console.error(e);
+      err.textContent = t('failed') + errText(e); err.hidden = false;
+    } finally { go.disabled = false; go.textContent = t('print'); }
   });
   dPrint.showModal();
   render();
 }
-window.addEventListener('afterprint', () => {
-  document.body.classList.remove('printing');
-  const out = document.getElementById('printOut'); if (out) out.innerHTML = '';
-});
 
 /* ---------- pointer interaction ---------- */
 const tip = document.getElementById('tip');
@@ -2025,12 +2119,11 @@ if (m && people.has(+m[1])) select(people.get(+m[1]).node, { instant: true });
 else if (g && nodes[+g[1]] && nodes[+g[1]].kind === 'group') select(+g[1], { instant: true });
 else select(ROOT, { instant: true });
 // a signed-in editor gets the review button; #admin opens the sign-in (or the queue) directly
-// the phone view's Print button lands here (?print=1#p…): open the print dialog, and go back to the phone
-// view once it is closed or the sheets have gone to the printer
+// the phone view's Preuzmi pdf button lands here (?print=1#p…): open the download dialog, and go back to the
+// phone view once it closes (after the download, or on Cancel)
 if (new URLSearchParams(location.search).has('print') && nodes[sel].kind === 'person') {
   const back = () => { if (history.length > 1) history.back(); else location.replace(location.pathname + location.hash); };
-  dPrint.addEventListener('close', () => { if (!document.body.classList.contains('printing')) back(); });
-  window.addEventListener('afterprint', back);
+  dPrint.addEventListener('close', () => setTimeout(back, 300));
   openPrint(nodes[sel].p);
 }
 checkAdmin().then(ok => {
