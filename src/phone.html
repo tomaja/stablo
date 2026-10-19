@@ -12,7 +12,7 @@
    siblings are a swipe away, and the controls sit in a bottom bar within thumb reach. */
 :root {
   --bg: #eef1ec; --surface: #f8faf6; --raise: #ffffff; --ink: #1d2621; --muted: #5f6a63; --faint: #8b958e;
-  --line: #d3d9d1; --accent: #8c2a4d; --accent-soft: #8c2a4d1f; --on-accent: #ffffff;
+  --line: #d3d9d1; --accent: #8c2a4d; --accent-soft: #8c2a4d1f; --on-accent: #ffffff; --alert: #c8231b; --alert-soft: #c8231b26;
   --c1: #2b6a92; --c2: #3b7d4c; --c3: #a5561c; --c4: #6a4ea3; --c5: #1a8580; --c6: #6d7a24; --c0: #848c86;
   --f-display: "Spectral", "Iowan Old Style", Georgia, serif;
   --f-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
@@ -23,14 +23,14 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #101513; --surface: #161c19; --raise: #1d2420; --ink: #e5eae4; --muted: #9ba59e; --faint: #6f7972;
-    --line: #2a332e; --accent: #e985a9; --accent-soft: #e985a926; --on-accent: #1f0d15;
+    --line: #2a332e; --accent: #e985a9; --accent-soft: #e985a926; --on-accent: #1f0d15; --alert: #ff6a5c; --alert-soft: #ff6a5c2e;
     --c1: #72b4de; --c2: #7cc58d; --c3: #e59c62; --c4: #ab9ce8; --c5: #5ccbc3; --c6: #bac56c; --c0: #6c756f;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #101513; --surface: #161c19; --raise: #1d2420; --ink: #e5eae4; --muted: #9ba59e; --faint: #6f7972;
-  --line: #2a332e; --accent: #e985a9; --accent-soft: #e985a926; --on-accent: #1f0d15;
+  --line: #2a332e; --accent: #e985a9; --accent-soft: #e985a926; --on-accent: #1f0d15; --alert: #ff6a5c; --alert-soft: #ff6a5c2e;
   --c1: #72b4de; --c2: #7cc58d; --c3: #e59c62; --c4: #ab9ce8; --c5: #5ccbc3; --c6: #bac56c; --c0: #6c756f;
   color-scheme: dark;
 }
@@ -156,6 +156,36 @@ mark { background: none; color: var(--accent); font-weight: 600; }
 :root[data-dir="back"]::view-transition-old(page) { animation-name: out-r; }
 :root[data-dir="back"]::view-transition-new(page) { animation-name: in-l; }
 #page { view-transition-name: page; }
+/* editors: sign-in and the review queue */
+.bar.admin { grid-template-columns: repeat(4, 1fr); }
+.bar .ic { position: relative; display: inline-flex; }
+.badge { position: absolute; top: -5px; left: 15px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+  background: var(--accent); color: var(--on-accent); font: 600 11px/18px var(--f-body); text-align: center; }
+.foot { margin: 28px 0 0; text-align: center; }
+.linkbtn { border: 0; background: none; padding: 8px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
+.sheet-h h2 { flex: 1; margin: 0; font: 500 20px/1.2 var(--f-display); }
+.form { display: grid; gap: 12px; }
+.form label { display: grid; gap: 6px; font: 500 11px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+.form input { height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--raise); font: 16px var(--f-body); outline: none; text-transform: none; letter-spacing: 0; color: var(--ink); }
+.form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.msg { margin: 0; font-size: 14px; color: var(--muted); }
+.msg.err { color: var(--accent); }
+.sg { border: 1px solid var(--line); border-radius: 12px; background: var(--raise); padding: 12px 14px; display: grid; gap: 10px; margin: 0 0 12px; }
+.sg.root { border: 2px solid var(--alert); box-shadow: 0 0 0 4px var(--alert-soft); }
+.sg.root .eyebrow { color: var(--alert); font-weight: 600; }
+.sg .who { font-size: 12.5px; color: var(--muted); }
+.sg .ttl { font: 500 19px/1.2 var(--f-display); }
+.sg a.ttl { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.chg { margin: 0; display: grid; gap: 8px; }
+.chg div { display: grid; grid-template-columns: 104px 1fr; gap: 10px; font-size: 14.5px; }
+.chg dt { font: 500 10.5px/20px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+.chg dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.chg .old { display: block; color: var(--muted); text-decoration: line-through; }
+.chg .new { display: block; font-weight: 600; }
+.chg .none { color: var(--faint); font-style: italic; font-weight: 400; text-decoration: none; }
+.sg .note2 { margin: 0; font-size: 14px; padding: 8px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); overflow-wrap: anywhere; }
+.sg .acts { justify-content: flex-end; margin-top: 2px; }
+.sg .acts .btn { height: 44px; padding: 0 18px; }
 @media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
 </style>
 </head>
@@ -165,10 +195,27 @@ mark { background: none; color: var(--accent); font-weight: 600; }
   <a href="#" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>Početak</a>
   <a href="#" id="bUp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span id="lUp">Roditelj</span></a>
   <button type="button" id="bSearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>Traži</button>
+  <button type="button" id="bRev" hidden><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 13l2.5-7.5h11L20 13v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20"/></svg><span class="badge" id="nRev" hidden></span></span>Predlozi</button>
 </nav>
 <div class="sheet" id="sheet" hidden>
   <div class="sheet-h"><input id="q" type="search" placeholder="Ime, prezime, mesto ili godina" autocomplete="off" spellcheck="false" aria-label="Traži"><button type="button" id="qClose">Zatvori</button></div>
   <div class="sheet-b" id="qRes"></div>
+</div>
+<div class="sheet" id="loginSheet" hidden>
+  <div class="sheet-h"><h2>Prijava urednika</h2><button type="button" data-close-sheet>Zatvori</button></div>
+  <div class="sheet-b">
+    <form class="form" id="loginForm">
+      <p class="msg">Samo urednici mogu da odobravaju predloge.</p>
+      <label>E-pošta<input name="email" type="email" autocomplete="username" required></label>
+      <label>Lozinka<input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="msg err" id="loginErr" role="alert" hidden></p>
+      <div class="acts"><button type="submit" class="btn primary">Prijavi se</button></div>
+    </form>
+  </div>
+</div>
+<div class="sheet" id="revSheet" hidden>
+  <div class="sheet-h"><h2>Predlozi izmena</h2><button type="button" data-close-sheet>Zatvori</button></div>
+  <div class="sheet-b" id="revBody"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.79.0/dist/umd/supabase.js"></script>
@@ -201,6 +248,8 @@ let rows;
 try { rows = await loadRows(); }
 catch (e) { console.error(e); $('page').innerHTML = '<p class="loading">Rodoslov trenutno ne može da se učita.</p>'; return; }
 
+const rowById = new Map(rows.map(r => [r.id, r]));
+let isAdmin = false;
 const people = new Map();
 for (const r of rows) people.set(r.id, { id: r.id, ime: r.ime || '?', nad: r.nadimak || '', prez: r.prezime || '', god: r.rodjen,
   opis: r.opis || '', mesto: r.mesto || '', sup: r.supruznik || '', izv: r.izvor || '', nap: r.napomena || '', sex: r.pol,
@@ -252,7 +301,9 @@ function viewHome() {
     <div class="acts"><button type="button" class="btn primary" data-tree="">${treeIcon}Celo stablo</button></div></div>
     <div class="sect"><h2>Porodice<span>${groupList.length}</span></h2><ul class="rows">${groupList.map(g =>
       `<li><a class="row" href="${founderHref(g)}">${dot(g.rs[0])}<span class="nm"><b>${esc(g.sur)}</b><small>${g.rs.length > 1 ? `${g.rs.length} loza` : `začetnik: ${esc(name(g.rs[0]))}`}</small></span>
-        <span class="cnt">${fmt(g.size)}<span>osoba</span></span>${chev}</a></li>`).join('')}</ul></div>`;
+        <span class="cnt">${fmt(g.size)}<span>osoba</span></span>${chev}</a></li>`).join('')}</ul></div>
+    <p class="foot">${isAdmin ? '<button type="button" class="linkbtn" data-open-review>Predlozi izmena</button>'
+      : '<button type="button" class="linkbtn" data-open-login>Prijava za urednike</button>'}</p>`;
 }
 
 function viewFamily(sur) {
@@ -388,6 +439,114 @@ $('bSearch').onclick = openSearch;
 $('qClose').onclick = closeSearch;
 q.addEventListener('input', search);
 res.addEventListener('click', e => { if (e.target.closest('a')) closeSearch(); });
+
+/* ---------- editors: sign in and approve or reject suggestions without leaving the phone view ---------- */
+const FIELDS = { ime: 'Ime', nadimak: 'Nadimak', prezime: 'Prezime', rodjen: 'Godina rođenja', pol: 'Pol', opis: 'Zanimanje',
+  mesto: 'Mesto', supruznik: 'Supružnik', izvor: 'Izvor', napomena: 'Napomena' };
+const showVal = (k, v) => v == null || v === '' ? '<span class="none">prazno</span>' : esc(k === 'pol' ? (v === 'f' ? 'ženski' : v === 'm' ? 'muški' : v) : v);
+const openSheet = id => { $(id).hidden = false; document.body.style.overflow = 'hidden'; };
+const closeSheet = id => { $(id).hidden = true; document.body.style.overflow = ''; };
+let reloadTo = null;   // an approved new person changes the tree's shape: reload onto them once the queue closes
+document.querySelectorAll('[data-close-sheet]').forEach(b => b.onclick = () => {
+  const id = b.closest('.sheet').id;
+  closeSheet(id);
+  if (id === 'revSheet' && reloadTo != null) { location.hash = '#p' + reloadTo; location.reload(); }
+});
+async function checkAdmin() {
+  const { data: { session } } = await sb.auth.getSession();
+  const { data } = session ? await sb.rpc('is_admin') : { data: false };
+  isAdmin = data === true;
+  $('bRev').hidden = !isAdmin;
+  document.querySelector('.bar').classList.toggle('admin', isAdmin);
+  if (cur.kind === 'home') render();
+  if (isAdmin) refreshPending();
+  return isAdmin;
+}
+async function refreshPending() {
+  const { count } = await sb.from('suggestions').select('id', { count: 'exact', head: true }).eq('status', 'pending');
+  $('nRev').textContent = count || ''; $('nRev').hidden = !count;
+}
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, btn = f.querySelector('[type=submit]'), err = $('loginErr');
+  btn.disabled = true; err.hidden = true;
+  try {
+    const { error } = await sb.auth.signInWithPassword({ email: f.elements.email.value.trim(), password: f.elements.password.value });
+    if (error) throw error;
+    if (!await checkAdmin()) { await sb.auth.signOut(); throw new Error('Ovaj nalog nema urednička prava.'); }
+    f.reset(); closeSheet('loginSheet'); openReview();
+  } catch (x) { err.textContent = x.message || String(x); err.hidden = false; }
+  finally { btn.disabled = false; }
+});
+function sgCard(s) {
+  const p = people.get(s.person_id), raw = rowById.get(s.person_id) || {}, c = s.changes || {};
+  const isNew = s.kind === 'add_child' || s.kind === 'add_root';
+  const who = [s.author || 'anonimno', s.contact, new Date(s.created_at).toLocaleString('sr-Latn', { dateStyle: 'medium', timeStyle: 'short' })].filter(Boolean).map(esc).join(' · ');
+  let head;
+  if (s.kind === 'add_root') {
+    const fam = groupList.find(g => fold(g.sur) === fold(c.prezime));
+    head = `<div class="eyebrow">Nova osoba bez roditelja · ${fam ? `ide u porodicu ${esc(fam.sur)}` : 'novo prezime u stablu'}</div>
+      <div class="ttl">${esc([c.ime, c.nadimak ? `„${c.nadimak}”` : '', c.prezime].filter(Boolean).join(' '))}</div>`;
+  } else {
+    head = `<div class="eyebrow">${s.kind === 'add_child' ? 'Novo dete osobe' : 'Izmena'}</div>
+      ${p ? `<a class="ttl" href="#p${p.id}" data-go>${esc(name(p))}</a>` : `<div class="ttl">#${esc(s.person_id)}</div>`}`;
+  }
+  const rowsHtml = Object.entries(c).map(([k, v]) => `<div><dt>${esc(FIELDS[k] || k)}</dt><dd>${isNew ? '' : `<span class="old">${showVal(k, raw[k])}</span>`}<span class="new">${showVal(k, v)}</span></dd></div>`).join('');
+  return `<article class="sg${s.kind === 'add_root' ? ' root' : ''}" data-id="${s.id}">${head}<div class="who">${who}</div>
+    <dl class="chg">${rowsHtml}</dl>${s.comment ? `<p class="note2">${esc(s.comment)}</p>` : ''}
+    <p class="msg err" hidden></p>
+    <div class="acts"><button type="button" class="btn" data-do="reject">Odbij</button><button type="button" class="btn primary" data-do="approve">Odobri</button></div></article>`;
+}
+async function openReview() {
+  openSheet('revSheet');
+  const body = $('revBody');
+  body.innerHTML = '<p class="msg">Učitavanje predloga…</p>';
+  const { data, error } = await sb.from('suggestions').select('*').eq('status', 'pending').order('created_at');
+  const list = error ? [] : data;
+  body.innerHTML = (error ? `<p class="msg err">Predlozi trenutno ne mogu da se učitaju: ${esc(error.message)}</p>`
+    : `<p class="msg" id="revLede" style="margin-bottom:12px">${list.length ? `${list.length} na čekanju. Odobreni predlog se odmah primenjuje; odbijeni ostaje zabeležen.` : 'Nema predloga na čekanju.'}</p>`)
+    + list.map(sgCard).join('')
+    + '<p class="foot"><button type="button" class="linkbtn" data-signout>Odjavi se</button></p>';
+}
+// an approved edit applies here at once; the review stays open
+function applyRow(r) {
+  rowById.set(r.id, r);
+  const q = people.get(r.id); if (!q) return;
+  Object.assign(q, { ime: r.ime || '?', nad: r.nadimak || '', prez: r.prezime || '', god: r.rodjen, opis: r.opis || '', mesto: r.mesto || '',
+    sup: r.supruznik || '', izv: r.izvor || '', nap: r.napomena || '', sex: r.pol });
+}
+$('revBody').addEventListener('click', async e => {
+  if (e.target.closest('[data-signout]')) {
+    await sb.auth.signOut(); closeSheet('revSheet'); await checkAdmin(); return;
+  }
+  if (e.target.closest('[data-go]')) { closeSheet('revSheet'); return; }   // the link itself opens the person
+  const b = e.target.closest('button[data-do]'); if (!b) return;
+  const card = b.closest('.sg'), sid = +card.dataset.id, msg = card.querySelector('.msg');
+  card.querySelectorAll('button[data-do]').forEach(x => { x.disabled = true; });
+  try {
+    if (b.dataset.do === 'approve') {
+      const { data, error } = await sb.rpc('approve_suggestion', { sid });
+      if (error) throw error;
+      if (people.has(data.id)) { applyRow(data); render(); } else reloadTo = data.id;
+    } else {
+      const { error } = await sb.rpc('reject_suggestion', { sid });
+      if (error) throw error;
+    }
+    card.remove();
+    const left = $('revBody').querySelectorAll('.sg').length;
+    $('revLede').textContent = left ? `${left} na čekanju. Odobreni predlog se odmah primenjuje; odbijeni ostaje zabeležen.` : 'Nema predloga na čekanju.';
+    refreshPending();
+  } catch (x) {
+    msg.textContent = 'Nije uspelo: ' + (x.message || String(x)); msg.hidden = false;
+    card.querySelectorAll('button[data-do]').forEach(y => { y.disabled = false; });
+  }
+});
+$('page').addEventListener('click', e => {
+  if (e.target.closest('[data-open-login]')) openSheet('loginSheet');
+  else if (e.target.closest('[data-open-review]')) openReview();
+});
+$('bRev').onclick = openReview;
+checkAdmin();
 })();
 </script>
 </body>
