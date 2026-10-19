@@ -2025,6 +2025,14 @@ if (m && people.has(+m[1])) select(people.get(+m[1]).node, { instant: true });
 else if (g && nodes[+g[1]] && nodes[+g[1]].kind === 'group') select(+g[1], { instant: true });
 else select(ROOT, { instant: true });
 // a signed-in editor gets the review button; #admin opens the sign-in (or the queue) directly
+// the phone view's Print button lands here (?print=1#p…): open the print dialog, and go back to the phone
+// view once it is closed or the sheets have gone to the printer
+if (new URLSearchParams(location.search).has('print') && nodes[sel].kind === 'person') {
+  const back = () => { if (history.length > 1) history.back(); else location.replace(location.pathname + location.hash); };
+  dPrint.addEventListener('close', () => { if (!document.body.classList.contains('printing')) back(); });
+  window.addEventListener('afterprint', back);
+  openPrint(nodes[sel].p);
+}
 checkAdmin().then(ok => {
   if (ok) renderPanel();
   if (wantsAdmin) { if (ok) openReview(); else openLogin(); }
