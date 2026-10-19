@@ -1,4 +1,6 @@
 <title>{{TITLE}}</title>
+<!-- favicon: the Preuzmi pdf tree, in the accent color -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cstyle%3Esvg{color:%238c2a4d}@media(prefers-color-scheme:dark){svg{color:%23e985a9}}%3C/style%3E%3Cpath d='M8 14.6V8.4M8 8.4 4.6 5.4M8 8.4l3.4-3M8 8.4V4.2M8 11 5.2 9.4M6.4 14.6h3.2'/%3E%3Ccircle cx='4' cy='4.8' r='1.3' fill='currentColor' stroke='none'/%3E%3Ccircle cx='12' cy='4.8' r='1.3' fill='currentColor' stroke='none'/%3E%3Ccircle cx='8' cy='3' r='1.3' fill='currentColor' stroke='none'/%3E%3Ccircle cx='4.6' cy='9' r='1.1' fill='currentColor' stroke='none'/%3E%3C/svg%3E">
 <script>
 // phones get the phone view, unless the full page was asked for (?full=1 from its edit link, ?view=tree for its disk, #admin)
 (function (phone) {
@@ -221,6 +223,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .dlg-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .dlg-h h2 { margin: 6px 0 0; font: 500 24px/1.15 var(--f-display); letter-spacing: -0.01em; text-wrap: balance; }
 .dlg-lede { margin: 0; color: var(--muted); font-size: 13.5px; max-width: 60ch; }
+/* one-time welcome: what visitors can do here */
+.tips { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.tips li { display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; }
+.tips .ic { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.tips b { display: block; font-weight: 600; }
+.tips p { margin: 3px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+.tips .tag { display: inline-block; font-weight: 600; font-size: 12.5px; color: var(--ink); white-space: nowrap; border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; background: var(--raise); }
 .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; margin: 0; padding: 0; border: 0; min-width: 0; }
 .fgrid legend { padding: 0; margin-bottom: 10px; font: 500 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .fld { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
@@ -367,6 +376,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 <dialog class="dlg" id="dLogin"></dialog>
 <dialog class="dlg wide" id="dReview"></dialog>
 <dialog class="dlg wide" id="dPrint"></dialog>
+<dialog class="dlg" id="dWelcome"></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.79.0/dist/umd/supabase.js"></script>
 <script>
@@ -409,6 +419,10 @@ const T = {
     childLede: 'Upišite šta znate o detetu. Nova osoba se pojavljuje u stablu tek kada urednik odobri predlog.',
     childLedeAdmin: 'Prijavljeni ste kao urednik: dete se odmah dodaje u stablo.',
     addPerson: 'Dodaj osobu', newPerson: 'Nova osoba bez roditelja', rootBadge: 'Nova osoba bez roditelja',
+    welcomeTitle: 'Dobro došli u rodoslov', welcomeLede: 'Ovo stablo pravimo zajedno. Evo šta možete da uradite:', gotIt: 'Razumem',
+    tipEditT: 'Predložite izmenu', tipEdit: (a, b) => `Kod svake osobe kliknite ${a} da ispravite ili dopunite podatke, ili ${b}. Izmena se pojavljuje kada je urednik odobri.`,
+    tipAddT: 'Dodajte osobu', tipAdd: a => `Ako vašeg pretka nema u stablu, a ne znate mu roditelje, kliknite ${a} na početnoj strani. Nova osoba započinje svoju lozu.`,
+    tipPdfT: 'Preuzmite svoju lozu', tipPdf: a => `Izaberite osobu i kliknite ${a}: dobijate njene pretke i potomke kao PDF, spreman za štampu.`,
     newPersonVisitor: 'Upišite šta znate. Osoba se pojavljuje u stablu tek kada urednik odobri predlog. Ako se prezime poklapa sa postojećim, dodaje se u tu porodicu.',
     joinsFamily: s => `ide u porodicu ${s}`, newFamily: 'novo prezime u stablu',
     newPersonLede: 'Osoba bez roditelja postaje začetnik loze. Ako se prezime poklapa sa postojećim, dodaje se u tu porodicu.',
@@ -463,6 +477,10 @@ const T = {
     childLede: 'Fill in what you know about the child. The new person appears in the tree once an editor approves the suggestion.',
     childLedeAdmin: 'You are signed in as an editor: the child is added to the tree right away.',
     addPerson: 'Add person', newPerson: 'New person without parents', rootBadge: 'New person without parents',
+    welcomeTitle: 'Welcome to the family tree', welcomeLede: 'We build this tree together. Here’s what you can do:', gotIt: 'Got it',
+    tipEditT: 'Suggest a change', tipEdit: (a, b) => `On any person, click ${a} to correct or add details, or ${b}. Changes appear once an editor approves them.`,
+    tipAddT: 'Add a person', tipAdd: a => `If your ancestor isn’t in the tree and their parents are unknown, click ${a} on the home page. The new person starts a line of their own.`,
+    tipPdfT: 'Download your lineage', tipPdf: a => `Pick a person and click ${a} to get their ancestors and descendants as a PDF, ready to print.`,
     newPersonVisitor: 'Fill in what you know. The person appears in the tree once an editor approves the suggestion. If the surname matches an existing family, they join that family.',
     joinsFamily: s => `joins the ${s} family`, newFamily: 'new surname in the tree',
     newPersonLede: 'A person without parents starts a lineage. If the surname matches an existing family, they join that family.',
@@ -942,7 +960,8 @@ panelIn.addEventListener('click', e => {
 
 /* ---------- editing: visitors suggest, editors (admins table) approve ---------- */
 let isAdmin = false;
-const dEdit = document.getElementById('dEdit'), dLogin = document.getElementById('dLogin'), dReview = document.getElementById('dReview');
+const dEdit = document.getElementById('dEdit'), dLogin = document.getElementById('dLogin'), dReview = document.getElementById('dReview'),
+  dWelcome = document.getElementById('dWelcome');
 const norm = (k, v) => {
   if (v == null) return null;
   const s = String(v).trim();
@@ -959,7 +978,7 @@ const outsideBox = (d, e) => {
   const r = d.getBoundingClientRect();
   return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
 };
-for (const d of [dEdit, dLogin, dReview]) {
+for (const d of [dEdit, dLogin, dReview, dWelcome]) {
   let downOutside = false;
   d.addEventListener('pointerdown', e => { downOutside = e.target === d && outsideBox(d, e); });
   d.addEventListener('click', e => {
@@ -2126,10 +2145,41 @@ if (new URLSearchParams(location.search).has('print') && nodes[sel].kind === 'pe
   dPrint.addEventListener('close', () => setTimeout(back, 300));
   openPrint(nodes[sel].p);
 }
+// the phone view's Dodaj osobu button lands here (?add=1): open the new-person form, then go back the same way
+const asked = new URLSearchParams(location.search);
+if (asked.has('add')) {
+  const back = () => { if (history.length > 1) history.back(); else location.replace(location.pathname + location.hash); };
+  dEdit.addEventListener('close', () => setTimeout(back, 300), { once: true });
+  openNew('');
+}
 checkAdmin().then(ok => {
   if (ok) renderPanel();
   if (wantsAdmin) { if (ok) openReview(); else openLogin(); }
 });
+
+/* ---------- one-time welcome: suggesting changes, adding a person, the PDF. Shown once per browser
+   (the phone view shares the same flag), never over the full-screen tree, a download or a sign-in. ---------- */
+const WELCOME_KEY = 'stablo.welcome';
+let welcomed = true;  // if the browser blocks storage, rather never than on every visit
+try { welcomed = localStorage.getItem(WELCOME_KEY) === '1'; } catch (e) {}
+function openWelcome() {
+  const tag = s => `<span class="tag">${esc(s)}</span>`;
+  const icon = d => `<span class="ic"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg></span>`;
+  dWelcome.innerHTML = `<div class="dlg-in">
+    <div class="dlg-h"><div><div class="eyebrow">${esc(CFG.short)}</div><h2>${esc(t('welcomeTitle'))}</h2></div>${closeBtn}</div>
+    <p class="dlg-lede">${esc(t('welcomeLede'))}</p>
+    <ul class="tips">
+      <li>${icon('<path d="M10.5 2.5l3 3L6 13H3v-3z"></path>')}<div><b>${esc(t('tipEditT'))}</b><p>${t('tipEdit')(tag(t('edit')), tag(t('addChild')))}</p></div></li>
+      <li>${icon('<circle cx="8" cy="5.5" r="2.5"></circle><path d="M3 14c.6-2.6 2.6-4 5-4M12 10v4M10 12h4"></path>')}<div><b>${esc(t('tipAddT'))}</b><p>${t('tipAdd')(tag(t('addPerson')))}</p></div></li>
+      <li>${icon('<path d="M8 14.6V8.4M8 8.4 4.6 5.4M8 8.4l3.4-3M8 8.4V4.2M8 11 5.2 9.4M6.4 14.6h3.2"></path>')}<div><b>${esc(t('tipPdfT'))}</b><p>${t('tipPdf')(tag(t('pdf')))}</p></div></li>
+    </ul>
+    <div class="dlg-f"><button type="button" class="btn primary" data-close>${esc(t('gotIt'))}</button></div>
+  </div>`;
+  dWelcome.addEventListener('close', () => { try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {} }, { once: true });
+  dWelcome.showModal();
+  dWelcome.querySelector('.btn.primary').focus();
+}
+if (!welcomed && !TREE_ONLY && !wantsAdmin && !asked.has('print') && !asked.has('add') && !document.querySelector('dialog[open]')) openWelcome();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { dirty = true; });
 requestAnimationFrame(loop);
 })();
