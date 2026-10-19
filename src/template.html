@@ -26,6 +26,7 @@
   --accent: #8c2a4d;        /* višnja: selection + ancestor path */
   --accent-soft: #8c2a4d1f;
   --on-accent: #ffffff;
+  --alert: #c8231b; --alert-soft: #c8231b26;   /* review: new people without parents */
   --c1: #2b6a92; --c2: #3b7d4c; --c3: #a5561c; --c4: #6a4ea3; --c5: #1a8580; --c6: #6d7a24; --c0: #848c86;
   --f-display: "Spectral", "Iowan Old Style", Georgia, serif;
   --f-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
@@ -37,7 +38,7 @@
   :root:not([data-theme="light"]) {
     --bg: #101513; --surface: #161c19; --raise: #1d2420; --ink: #e5eae4; --muted: #9ba59e; --faint: #6f7972;
     --line: #2a332e; --disk: #141a17; --ring: #212925; --edge: #7d887f;
-    --accent: #e985a9; --accent-soft: #e985a926; --on-accent: #1f0d15;
+    --accent: #e985a9; --accent-soft: #e985a926; --on-accent: #1f0d15; --alert: #ff6a5c; --alert-soft: #ff6a5c2e;
     --c1: #72b4de; --c2: #7cc58d; --c3: #e59c62; --c4: #ab9ce8; --c5: #5ccbc3; --c6: #bac56c; --c0: #6c756f;
     color-scheme: dark;
   }
@@ -45,7 +46,7 @@
 :root[data-theme="dark"] {
   --bg: #101513; --surface: #161c19; --raise: #1d2420; --ink: #e5eae4; --muted: #9ba59e; --faint: #6f7972;
   --line: #2a332e; --disk: #141a17; --ring: #212925; --edge: #7d887f;
-  --accent: #e985a9; --accent-soft: #e985a926; --on-accent: #1f0d15;
+  --accent: #e985a9; --accent-soft: #e985a926; --on-accent: #1f0d15; --alert: #ff6a5c; --alert-soft: #ff6a5c2e;
   --c1: #72b4de; --c2: #7cc58d; --c3: #e59c62; --c4: #ab9ce8; --c5: #5ccbc3; --c6: #bac56c; --c0: #6c756f;
   color-scheme: dark;
 }
@@ -242,6 +243,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .sg-h button { border: 0; background: none; padding: 0; cursor: pointer; font: 500 17px/1.2 var(--f-display); color: var(--ink); text-align: left; }
 .sg-h button:hover { color: var(--accent); }
 .sg-h small { font: 12px var(--f-mono); color: var(--muted); }
+.sg.root { border: 2px solid var(--alert); box-shadow: 0 0 0 4px var(--alert-soft); }
+.sg.root .eyebrow { color: var(--alert); font-weight: 600; }
+.sg-h .nm-new { font: 500 17px/1.2 var(--f-display); }
 .diff { width: 100%; border-collapse: collapse; font-size: 13.5px; table-layout: fixed; }
 .diff th { width: 26%; text-align: left; font: 500 11px/1.3 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); padding: 5px 8px 5px 0; vertical-align: top; }
 .diff td { padding: 4px 8px; vertical-align: top; overflow-wrap: anywhere; }
@@ -352,7 +356,9 @@ const T = {
     addChild: 'Dodaj dete', childOf: 'Novo dete osobe', openPerson: 'Otvori', closeTree: 'Zatvori stablo',
     childLede: 'Upišite šta znate o detetu. Nova osoba se pojavljuje u stablu tek kada urednik odobri predlog.',
     childLedeAdmin: 'Prijavljeni ste kao urednik: dete se odmah dodaje u stablo.',
-    addPerson: 'Dodaj osobu', newPerson: 'Nova osoba bez roditelja',
+    addPerson: 'Dodaj osobu', newPerson: 'Nova osoba bez roditelja', rootBadge: 'Nova osoba bez roditelja',
+    newPersonVisitor: 'Upišite šta znate. Osoba se pojavljuje u stablu tek kada urednik odobri predlog. Ako se prezime poklapa sa postojećim, dodaje se u tu porodicu.',
+    joinsFamily: s => `ide u porodicu ${s}`, newFamily: 'novo prezime u stablu',
     newPersonLede: 'Osoba bez roditelja postaje začetnik loze. Ako se prezime poklapa sa postojećim, dodaje se u tu porodicu.',
     del: 'Obriši', delTitle: 'Brisanje osobe', delConfirm: 'Obriši',
     delLede: 'Brisanje se odmah primenjuje. Obrisani zapis ostaje sačuvan u tabeli deleted_people u Supabase-u.',
@@ -389,7 +395,9 @@ const T = {
     addChild: 'Add child', childOf: 'New child of', openPerson: 'Open', closeTree: 'Close tree',
     childLede: 'Fill in what you know about the child. The new person appears in the tree once an editor approves the suggestion.',
     childLedeAdmin: 'You are signed in as an editor: the child is added to the tree right away.',
-    addPerson: 'Add person', newPerson: 'New person without parents',
+    addPerson: 'Add person', newPerson: 'New person without parents', rootBadge: 'New person without parents',
+    newPersonVisitor: 'Fill in what you know. The person appears in the tree once an editor approves the suggestion. If the surname matches an existing family, they join that family.',
+    joinsFamily: s => `joins the ${s} family`, newFamily: 'new surname in the tree',
     newPersonLede: 'A person without parents starts a lineage. If the surname matches an existing family, they join that family.',
     del: 'Delete', delTitle: 'Delete person', delConfirm: 'Delete',
     delLede: 'Deleting applies right away. A copy of each deleted record is kept in the deleted_people table in Supabase.',
@@ -794,15 +802,15 @@ function renderPanel() {
           const target = g.node != null ? g.node : g.rs[0].node;
           return `<li><button type="button" data-n="${target}">${dot(g.rs[0])}<span class="nm">${esc(g.sur)}</span><span class="yr">${fmt(g.size)}<small>${g.rs.length > 1 ? esc(t('lineCount')(g.rs.length)) : ''}</small></span></button></li>`;
         }).join('')}</ul></div>
-      ${isAdmin ? `<div class="acts"><button type="button" class="btn" data-act="new"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>${esc(t('addPerson'))}</button></div>`
-        : `<button type="button" class="linkbtn" data-act="login">${esc(t('editorLogin'))}</button>`}`;
+      <div class="acts"><button type="button" class="btn" data-act="new"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>${esc(t('addPerson'))}</button></div>
+      ${isAdmin ? '' : `<button type="button" class="linkbtn" data-act="login">${esc(t('editorLogin'))}</button>`}`;
   } else if (n.kind === 'group') {
     const g = n.group;
     h += `<div class="eyebrow">${dot(g.rs[0])}${esc(t('famLines'))}</div>
       <div><h2 class="name">${esc(g.sur)}</h2><p class="sub">${esc(t('personCount')(g.size))} · ${esc(t('lineCount')(g.rs.length))}</p></div>
       <div class="sect"><h3>${esc(t('lineRoot'))}<b>${g.rs.length}</b></h3><ul class="plist">${
         g.rs.map(r => personBtn(r, `<small>${fmt(r.size)}</small>`)).join('')}</ul></div>
-      ${isAdmin ? `<div class="acts"><button type="button" class="btn" data-act="new"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>${esc(t('addPerson'))}</button></div>` : ''}`;
+      <div class="acts"><button type="button" class="btn" data-act="new"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>${esc(t('addPerson'))}</button></div>`;
   } else {
     const p = n.p;
     const anc = ancestorsOf(sel).reverse().filter(k => nodes[k].kind === 'person').map(k => nodes[k].p);
@@ -948,14 +956,20 @@ function openEdit(p, child) {
   form.elements.ime.focus();
 }
 
-/* admins only: a person with no parent; the tree is laid out once at load, so the page reloads onto them */
+/* a person with no parent. Editors add them straight away (the tree is laid out once at load, so the page
+   reloads onto them); visitors send an 'add_root' suggestion that an editor approves. */
 function openNew(surname) {
   dEdit.innerHTML = `<form class="dlg-in" novalidate>
     <div class="dlg-h"><div><div class="eyebrow">${esc(CFG.short)}</div><h2>${esc(t('newPerson'))}</h2></div>${closeBtn}</div>
-    <p class="dlg-lede">${esc(t('newPersonLede'))}</p>
+    <p class="dlg-lede">${esc(isAdmin ? t('newPersonLede') : t('newPersonVisitor'))}</p>
     <div class="fgrid">${EDITABLE.map(k => fieldHtml(k, k === 'prezime' ? surname || null : null)).join('')}</div>
+    ${isAdmin ? '' : `<hr class="sep"><fieldset class="fgrid"><legend>${esc(t('about'))}</legend>
+      <label class="fld"><span>${esc(t('author'))}</span><input name="_author" type="text" maxlength="100" autocomplete="name"></label>
+      <label class="fld"><span>${esc(t('contact'))}</span><input name="_contact" type="text" maxlength="200" autocomplete="email"></label>
+      <label class="fld wide"><span>${esc(t('comment'))}</span><textarea name="_comment" rows="3" maxlength="2000"></textarea></label>
+    </fieldset>`}
     <p class="msg" role="status" hidden></p>
-    <div class="dlg-f"><button type="button" class="btn" data-close>${esc(t('cancel'))}</button><button type="submit" class="btn primary">${esc(t('save'))}</button></div>
+    <div class="dlg-f"><button type="button" class="btn" data-close>${esc(t('cancel'))}</button><button type="submit" class="btn primary">${esc(isAdmin ? t('save') : t('send'))}</button></div>
   </form>`;
   const form = dEdit.querySelector('form'), msg = form.querySelector('.msg'), submit = form.querySelector('[type=submit]');
   form.addEventListener('submit', async e => {
@@ -965,14 +979,24 @@ function openNew(surname) {
     for (const k of EDITABLE) { const v = norm(k, form.elements[k].value); if (v != null) data[k] = v; }
     submit.disabled = true; submit.textContent = t('sending');
     try {
-      const { data: row, error } = await sb.rpc('admin_create_person', { data });
+      if (isAdmin) {
+        const { data: row, error } = await sb.rpc('admin_create_person', { data });
+        if (error) throw error;
+        location.hash = '#p' + row.id;
+        location.reload();
+        return;
+      }
+      const val = n => norm('', form.elements[n].value);
+      const { error } = await sb.from('suggestions').insert({ kind: 'add_root', changes: data,
+        author: val('_author'), contact: val('_contact'), comment: val('_comment') });
       if (error) throw error;
-      location.hash = '#p' + row.id;
-      location.reload();
+      form.querySelectorAll('.fgrid, .sep, [type=submit]').forEach(el => el.remove());
+      form.querySelector('.dlg-f [data-close]').textContent = t('close');
+      msg.textContent = t('thanks'); msg.className = 'msg ok'; msg.hidden = false;
     } catch (err) {
       console.error(err);
       msg.textContent = t('failed') + errText(err); msg.className = 'msg err'; msg.hidden = false;
-      submit.disabled = false; submit.textContent = t('save');
+      submit.disabled = false; submit.textContent = isAdmin ? t('save') : t('send');
     }
   });
   dEdit.showModal();
@@ -1078,12 +1102,24 @@ async function openReview() {
   const list = error ? [] : data;
   const fmtDate = s => new Date(s).toLocaleString(lang === 'sr' ? 'sr-Latn' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short' });
   const card = s => {
-    const p = people.get(s.person_id), child = s.kind === 'add_child';
-    // a new child has no current values: its fields span both columns
+    const p = people.get(s.person_id), root = s.kind === 'add_root', child = s.kind === 'add_child' || root;
+    // a new person has no current values: their fields span both columns
     const rows = Object.entries(s.changes).map(([k, v]) => `<tr><th>${esc(t('fields')[k] || k)}</th>${child
       ? `<td class="new" colspan="2">${showField(k, v)}</td>`
       : `<td class="old">${showField(k, p ? p.row[k] : null)}</td><td class="new">${showField(k, v)}</td>`}</tr>`).join('');
     const who = [s.author || t('anon'), s.contact, fmtDate(s.created_at)].filter(Boolean).map(esc).join(' · ');
+    if (root) {
+      const c = s.changes, fam = groupList.find(g => surKey(g.sur) === surKey(c.prezime));
+      const where = fam ? t('joinsFamily')(fam.sur) : t('newFamily');
+      return `<article class="sg root" data-id="${s.id}">
+      <div class="eyebrow">${esc(t('rootBadge'))} · ${esc(where)}</div>
+      <div class="sg-h"><span class="nm-new">${esc([c.ime, c.nadimak ? `„${c.nadimak}”` : '', c.prezime].filter(Boolean).join(' '))}</span><small>${who}</small></div>
+      <table class="diff">${rows}</table>
+      ${s.comment ? `<p class="note">${esc(s.comment)}</p>` : ''}
+      <p class="msg err" hidden></p>
+      <div class="acts"><button type="button" class="btn" data-do="reject">${esc(t('reject'))}</button><button type="button" class="btn primary" data-do="approve">${esc(t('approve'))}</button></div>
+    </article>`;
+    }
     return `<article class="sg" data-id="${s.id}">
       ${child ? `<div class="eyebrow">${esc(t('childOf'))}</div>` : ''}
       <div class="sg-h"><button type="button" data-n="${p ? p.node : ''}">${p ? fullName(p) : '#' + s.person_id}</button><small>${who}</small></div>
