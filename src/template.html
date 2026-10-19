@@ -830,9 +830,21 @@ const show = v => v == null ? `<span class="none">${esc(t('empty'))}</span>` : e
 const showField = (k, v) => k === 'pol' && v ? esc(t(v === 'f' ? 'sexF' : 'sexM')) : show(v);
 const errText = err => (err && (err.message || err.error_description)) || String(err);
 const closeBtn = `<button type="button" class="btn icon" data-close aria-label="${esc(t('close'))}">×</button>`;
-for (const d of [dEdit, dLogin, dReview]) d.addEventListener('click', e => {
-  if (e.target === d || e.target.closest('[data-close]')) d.close();
-});
+// Close on the backdrop only when the press and the release both land outside the box. A drag that
+// starts in a field (selecting text) and ends past its edge also fires `click` on the dialog itself.
+const outsideBox = (d, e) => {
+  const r = d.getBoundingClientRect();
+  return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+};
+for (const d of [dEdit, dLogin, dReview]) {
+  let downOutside = false;
+  d.addEventListener('pointerdown', e => { downOutside = e.target === d && outsideBox(d, e); });
+  d.addEventListener('click', e => {
+    if (e.target.closest('[data-close]')) d.close();
+    else if (e.target === d && downOutside && outsideBox(d, e)) d.close();
+    downOutside = false;
+  });
+}
 function fieldHtml(k, v) {
   const wide = k === 'supruznik' || k === 'napomena' || k === 'opis' ? ' wide' : '';
   let input;
