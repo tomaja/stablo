@@ -106,6 +106,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .res .ctx { grid-column: 2 / 4; font-size: 12px; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .res mark { background: none; color: var(--accent); font-weight: 600; }
 .noresults { padding: 14px 10px; color: var(--muted); }
+.pick { border: 1px solid var(--line); border-radius: var(--r); background: var(--raise); max-height: 240px; overflow: auto; padding: 4px; }
+.pick:empty { display: none; }
+.chosen { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--accent); border-radius: var(--r); background: var(--accent-soft); }
+.chosen .nm { flex: 1; min-width: 0; font-weight: 500; }
+.chosen small { display: block; font-weight: 400; color: var(--muted); }
+.linknow { margin: 0; font-size: 13.5px; color: var(--muted); }
 
 .tools { display: flex; gap: 6px; }
 .btn {
@@ -419,6 +425,11 @@ const T = {
     childLede: 'Upišite šta znate o detetu. Nova osoba se pojavljuje u stablu tek kada urednik odobri predlog.',
     childLedeAdmin: 'Prijavljeni ste kao urednik: dete se odmah dodaje u stablo.',
     addPerson: 'Dodaj osobu', newPerson: 'Nova osoba bez roditelja', rootBadge: 'Nova osoba bez roditelja',
+    linkSpouse: 'Poveži supružnika', linkBadge: 'Povezivanje braka', linkNow: 'Trenutna veza:', change: 'Promeni',
+    linkLede: 'Potražite supružnika među osobama u stablu i izaberite ga. Veza se pojavljuje kada urednik odobri predlog.',
+    linkLedeAdmin: 'Prijavljeni ste kao urednik: veza se odmah dodaje.',
+    linkFind: 'Ime, prezime, mesto ili godina supružnika', linkReplace: 'Novi izbor zamenjuje trenutnu vezu.',
+    linkPick: 'Izaberite osobu sa spiska.', linkSame: 'Ova veza već postoji.',
     welcomeTitle: 'Dobro došli u rodoslov', welcomeLede: 'Ovo stablo pravimo zajedno. Evo šta možete da uradite:', gotIt: 'Razumem',
     tipEditT: 'Predložite izmenu', tipEdit: (a, b) => `Kod svake osobe kliknite ${a} da ispravite ili dopunite podatke, ili ${b}. Izmena se pojavljuje kada je urednik odobri.`,
     tipAddT: 'Dodajte osobu', tipAdd: a => `Ako vašeg pretka nema u stablu, a ne znate mu roditelje, kliknite ${a} na početnoj strani. Nova osoba započinje svoju lozu.`,
@@ -477,6 +488,11 @@ const T = {
     childLede: 'Fill in what you know about the child. The new person appears in the tree once an editor approves the suggestion.',
     childLedeAdmin: 'You are signed in as an editor: the child is added to the tree right away.',
     addPerson: 'Add person', newPerson: 'New person without parents', rootBadge: 'New person without parents',
+    linkSpouse: 'Link spouse', linkBadge: 'Marriage link', linkNow: 'Current link:', change: 'Change',
+    linkLede: 'Find the spouse among the people in the tree and pick them. The link appears once an editor approves it.',
+    linkLedeAdmin: 'You are signed in as an editor: the link is added right away.',
+    linkFind: 'Spouse’s name, surname, place or year', linkReplace: 'A new choice replaces the current link.',
+    linkPick: 'Pick a person from the list.', linkSame: 'This link already exists.',
     welcomeTitle: 'Welcome to the family tree', welcomeLede: 'We build this tree together. Here’s what you can do:', gotIt: 'Got it',
     tipEditT: 'Suggest a change', tipEdit: (a, b) => `On any person, click ${a} to correct or add details, or ${b}. Changes appear once an editor approves them.`,
     tipAddT: 'Add a person', tipAdd: a => `If your ancestor isn’t in the tree and their parents are unknown, click ${a} on the home page. The new person starts a line of their own.`,
@@ -928,7 +944,7 @@ function renderPanel() {
       <div><h2 class="name">${fullName(p)}</h2>
         ${bits.length ? `<p class="sub">${bits.join(' · ')}</p>` : ''}
         <div class="pills">${desc ? `<span class="pill">${fmt(desc)} ${esc(t('descendants'))}</span>` : ''}${!par ? `<span class="pill">${esc(t('lineRoot'))}</span>` : ''}</div>
-        <div class="acts"><button type="button" class="btn" data-act="edit"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"></path></svg>${esc(t('edit'))}</button><button type="button" class="btn" data-act="child"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>${esc(t('addChild'))}</button><button type="button" class="btn" data-act="print"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 14.6V8.4M8 8.4 4.6 5.4M8 8.4l3.4-3M8 8.4V4.2M8 11 5.2 9.4M6.4 14.6h3.2"></path><circle cx="4" cy="4.8" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="4.8" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="8" cy="3" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="4.6" cy="9" r="1.1" fill="currentColor" stroke="none"></circle></svg>${esc(t('pdf'))}</button>${isAdmin ? `<button type="button" class="btn danger" data-act="delete"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5"></path></svg>${esc(t('del'))}</button>` : ''}</div>
+        <div class="acts"><button type="button" class="btn" data-act="edit"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"></path></svg>${esc(t('edit'))}</button><button type="button" class="btn" data-act="child"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>${esc(t('addChild'))}</button><button type="button" class="btn" data-act="link"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="5.8" cy="8.6" r="3.6"></circle><circle cx="10.2" cy="7.4" r="3.6"></circle></svg>${esc(t('linkSpouse'))}</button><button type="button" class="btn" data-act="print"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 14.6V8.4M8 8.4 4.6 5.4M8 8.4l3.4-3M8 8.4V4.2M8 11 5.2 9.4M6.4 14.6h3.2"></path><circle cx="4" cy="4.8" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="4.8" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="8" cy="3" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="4.6" cy="9" r="1.1" fill="currentColor" stroke="none"></circle></svg>${esc(t('pdf'))}</button>${isAdmin ? `<button type="button" class="btn danger" data-act="delete"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5"></path></svg>${esc(t('del'))}</button>` : ''}</div>
       </div>`;
     const facts = [];
     if (p.sup) facts.push([t('spouse'), esc(p.sup)]);
@@ -951,6 +967,7 @@ panelIn.addEventListener('click', e => {
     else if (act === 'new') openNew(nodes[sel].kind === 'group' ? nodes[sel].group.sur : '');
     else if (act === 'delete') openDelete(nodes[sel].p);
     else if (act === 'print') openPrint(nodes[sel].p);
+    else if (act === 'link') openLink(nodes[sel].p);
     else openEdit(nodes[sel].p, act === 'child');
     return;
   }
@@ -1138,6 +1155,79 @@ function openDelete(p) {
   form.querySelector('[data-close]').focus();
 }
 
+/* link two people as spouses (people.brak_id): visitors suggest it, editors add it at once */
+const personLine = (q, withYear = true) => {
+  const par = q.par != null ? people.get(q.par) : null;
+  return [withYear && q.god != null ? yr(q.god) : '', par ? `${parentWord(par)}: ${plainName(par)}` : t('lineRoot'), q.mesto].filter(Boolean).join(' · ');
+};
+function openLink(p) {
+  const cur = p.brak != null ? people.get(p.brak) : null;
+  dEdit.innerHTML = `<form class="dlg-in" novalidate>
+    <div class="dlg-h"><div><div class="eyebrow">${dot(p)}${esc(t('linkSpouse'))}</div><h2>${fullName(p)}</h2></div>${closeBtn}</div>
+    <p class="dlg-lede">${esc(isAdmin ? t('linkLedeAdmin') : t('linkLede'))}</p>
+    ${cur ? `<p class="linknow">${esc(t('linkNow'))} <b>${esc(plainName(cur))}</b>${cur.god != null ? ' ' + esc(yr(cur.god)) : ''}. ${esc(t('linkReplace'))}</p>` : ''}
+    <div class="fgrid"><label class="fld wide"><span>${esc(t('fields').supruznik)}</span><input name="_find" type="search" autocomplete="off" spellcheck="false" placeholder="${esc(t('linkFind'))}"></label></div>
+    <div class="pick" id="lkPick" role="listbox"></div>
+    <div class="chosen" id="lkChosen" hidden></div>
+    ${isAdmin ? '' : `<hr class="sep"><fieldset class="fgrid"><legend>${esc(t('about'))}</legend>
+      <label class="fld"><span>${esc(t('author'))}</span><input name="_author" type="text" maxlength="100" autocomplete="name"></label>
+      <label class="fld"><span>${esc(t('contact'))}</span><input name="_contact" type="text" maxlength="200" autocomplete="email"></label>
+      <label class="fld wide"><span>${esc(t('comment'))}</span><textarea name="_comment" rows="3" maxlength="2000"></textarea></label>
+    </fieldset>`}
+    <p class="msg" role="status" hidden></p>
+    <div class="dlg-f"><button type="button" class="btn" data-close>${esc(t('cancel'))}</button><button type="submit" class="btn primary">${esc(isAdmin ? t('save') : t('send'))}</button></div>
+  </form>`;
+  const form = dEdit.querySelector('form'), msg = form.querySelector('.msg'), submit = form.querySelector('[type=submit]');
+  const find = form.elements._find, pick = document.getElementById('lkPick'), chosenEl = document.getElementById('lkChosen');
+  const say = (text, kind) => { msg.textContent = text; msg.className = 'msg' + (kind ? ' ' + kind : ''); msg.hidden = false; };
+  let found = [], chosen = null;
+  const list = () => {
+    found = searchPeople(find.value).map(x => x[1]).filter(o => o !== p).slice(0, 30);
+    pick.innerHTML = !find.value.trim() ? '' : found.length ? found.map((o, k) =>
+      `<div class="res" role="option" data-k="${k}">${dot(o)}<span class="nm">${esc(plainName(o))}</span><span class="yr">${o.god != null ? esc(yr(o.god)) : ''}</span><span class="ctx">${esc(personLine(o, false))}</span></div>`).join('')
+      : `<div class="noresults">${esc(t('noResults'))}</div>`;
+  };
+  const show = () => {
+    chosenEl.hidden = !chosen; pick.hidden = !!chosen; find.closest('.fgrid').hidden = !!chosen;
+    if (chosen) chosenEl.innerHTML = `${dot(chosen)}<span class="nm">${esc(plainName(chosen))}<small>${esc(personLine(chosen))}</small></span><button type="button" class="btn" data-change>${esc(t('change'))}</button>`;
+  };
+  find.addEventListener('input', list);
+  find.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (found.length === 1) { chosen = found[0]; show(); } } });
+  pick.addEventListener('click', e => { const r = e.target.closest('.res'); if (r) { chosen = found[+r.dataset.k]; msg.hidden = true; show(); } });
+  chosenEl.addEventListener('click', e => { if (e.target.closest('[data-change]')) { chosen = null; show(); find.focus(); } });
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!chosen) { say(t('linkPick'), 'err'); return; }
+    if (chosen.id === p.brak) { say(t('linkSame'), 'err'); return; }
+    const val = n => norm('', form.elements[n] && form.elements[n].value);
+    const row = { person_id: p.id, kind: 'link', changes: { brak_id: chosen.id }, original: { brak_id: p.brak ?? null },
+      author: val('_author'), contact: val('_contact'), comment: val('_comment') };
+    submit.disabled = true; submit.textContent = t('sending');
+    try {
+      if (isAdmin) {
+        const ins = await sb.from('suggestions').insert(row).select('id').single();
+        if (ins.error) throw ins.error;
+        await approve(ins.data.id);
+        dEdit.close();
+        showAdded();
+      } else {
+        const { error } = await sb.from('suggestions').insert(row);
+        if (error) throw error;
+        form.querySelectorAll('.fgrid, .sep, .pick, .chosen, .linknow, [type=submit]').forEach(el => el.remove());
+        form.querySelector('.dlg-f [data-close]').textContent = t('close');
+        say(t('thanks'), 'ok');
+      }
+    } catch (err) {
+      console.error(err);
+      say(t('failed') + errText(err), 'err');
+    } finally {
+      if (submit.isConnected) { submit.disabled = false; submit.textContent = isAdmin ? t('save') : t('send'); }
+    }
+  });
+  dEdit.showModal();
+  find.focus();
+}
+
 /* approve applies the change in the database, then here: names, search and the open panel update without a reload.
    A new child changes the tree's shape, which is laid out once at load, so the page reloads onto them instead. */
 let addedId = null;
@@ -1145,7 +1235,11 @@ async function approve(id, edited) {
   const { data, error } = await sb.rpc('approve_suggestion', edited ? { sid: id, edited } : { sid: id });
   if (error) throw error;
   const p = people.get(data.id);
-  if (p) { applyRow(p, data); reindex(p); dirty = true; renderPanel(); }
+  if (p) {
+    const relinked = (data.brak_id ?? null) !== (p.brak ?? null);   // a marriage link changes the drawing: reload onto them
+    applyRow(p, data); reindex(p); dirty = true; renderPanel();
+    if (relinked) addedId = data.id;
+  }
   else addedId = data.id;
   refreshPending();
 }
@@ -1210,6 +1304,23 @@ async function openReview() {
       ? `<td class="new" colspan="2">${showField(k, v)}</td>`
       : `<td class="old">${showField(k, p ? p.row[k] : null)}</td><td class="new">${showField(k, v)}</td>`}</tr>`).join('');
     const who = [s.author || t('anon'), s.contact, fmtDate(s.created_at)].filter(Boolean).map(esc).join(' · ');
+    if (s.kind === 'link') {
+      const sp = people.get(s.changes.brak_id), cur = p && p.brak != null ? people.get(p.brak) : null;
+      const btn = q => q ? `<button type="button" data-n="${q.node}">${fullName(q)}</button>` : `<span>#${esc(String(s.changes.brak_id))}</span>`;
+      const desc = q => q ? esc(plainName(q)) + (q.god != null ? ' ' + esc(yr(q.god)) : '') : `<span class="none">${esc(t('empty'))}</span>`;
+      return `<article class="sg" data-id="${s.id}">
+      <div class="eyebrow">${esc(t('linkBadge'))}</div>
+      <div class="sg-h">${btn(p)}<span aria-hidden="true">∞</span>${btn(sp)}<small>${who}</small></div>
+      <table class="diff">
+        <tr><th>${esc(t('inTree'))}</th><td class="old">${desc(cur)}</td><td class="new">${desc(sp)}</td></tr>
+        ${p ? `<tr><th>${esc(p.ime)}</th><td class="new" colspan="2">${esc(personLine(p))}</td></tr>` : ''}
+        ${sp ? `<tr><th>${esc(sp.ime)}</th><td class="new" colspan="2">${esc(personLine(sp))}</td></tr>` : ''}
+      </table>
+      ${s.comment ? `<p class="note">${esc(s.comment)}</p>` : ''}
+      <p class="msg err" hidden></p>
+      <div class="acts"><button type="button" class="btn" data-do="reject">${esc(t('reject'))}</button><button type="button" class="btn primary" data-do="approve">${esc(t('approve'))}</button></div>
+    </article>`;
+    }
     if (root) {
       const c = s.changes, fam = groupList.find(g => surKey(g.sur) === surKey(c.prezime));
       const where = fam ? t('joinsFamily')(fam.sur) : t('newFamily');
@@ -2030,10 +2141,11 @@ const index = [...people.values()].map(indexEntry);
 function reindex(p) { const k = index.findIndex(e => e.p === p); if (k >= 0) index[k] = indexEntry(p); }
 const q = document.getElementById('q'), resEl = document.getElementById('results');
 let results = [], active = 0;
-function runSearch() {
-  const toks = fold(q.value).split(/\s+/).filter(Boolean);
-  if (!toks.length) { resEl.hidden = true; results = []; return; }
+// people matching the words, best first, as [score, person]
+function searchPeople(text) {
+  const toks = fold(text).split(/\s+/).filter(Boolean);
   const out = [];
+  if (!toks.length) return out;
   for (const e of index) {
     let score = 0, ok = true;
     for (const tk of toks) {
@@ -2047,7 +2159,11 @@ function runSearch() {
     }
     if (ok) out.push([score, e.p]);
   }
-  out.sort((a, b) => (b[0] - a[0]) || ((a[1].god ?? 9999) - (b[1].god ?? 9999)) || (a[1].id - b[1].id));
+  return out.sort((a, b) => (b[0] - a[0]) || ((a[1].god ?? 9999) - (b[1].god ?? 9999)) || (a[1].id - b[1].id));
+}
+function runSearch() {
+  if (!q.value.trim()) { resEl.hidden = true; results = []; return; }
+  const out = searchPeople(q.value);
   results = out.slice(0, 60).map(x => x[1]); active = 0;
   renderResults(out.length);
 }

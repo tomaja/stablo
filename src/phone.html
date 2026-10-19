@@ -500,6 +500,18 @@ function sgCard(s) {
   const isNew = s.kind === 'add_child' || s.kind === 'add_root';
   const who = [s.author || 'anonimno', s.contact, new Date(s.created_at).toLocaleString('sr-Latn', { dateStyle: 'medium', timeStyle: 'short' })].filter(Boolean).map(esc).join(' · ');
   let head;
+  if (s.kind === 'link') {   // a marriage link: both people, and the link it would replace
+    const sp = people.get(c.brak_id), now = p && p.brak != null ? people.get(p.brak) : null;
+    const who2 = q => q ? `<a class="ttl" href="#p${q.id}" data-go>${esc(name(q))}</a>` : `<div class="ttl">#${esc(c.brak_id)}</div>`;
+    const line = q => q ? esc([q.god != null ? yr(q.god) : '', q.par != null ? `${people.get(q.par).sex === 'f' ? 'majka' : 'otac'}: ${name(people.get(q.par))}` : 'začetnik loze'].filter(Boolean).join(' · ')) : '';
+    return `<article class="sg" data-id="${s.id}"><div class="eyebrow">Povezivanje braka</div>
+      ${who2(p)}<div class="who">${line(p)}</div><div class="ttl" aria-hidden="true">∞</div>${who2(sp)}<div class="who">${line(sp)}</div>
+      <div class="who">${who}</div>
+      <dl class="chg"><div><dt>Brak u stablu</dt><dd><span class="old">${now ? esc(name(now)) : '<span class="none">prazno</span>'}</span><span class="new">${sp ? esc(name(sp)) : '#' + esc(c.brak_id)}</span></dd></div></dl>
+      ${s.comment ? `<p class="note2">${esc(s.comment)}</p>` : ''}
+      <p class="msg err" hidden></p>
+      <div class="acts"><button type="button" class="btn" data-do="reject">Odbij</button><button type="button" class="btn primary" data-do="approve">Odobri</button></div></article>`;
+  }
   if (s.kind === 'add_root') {
     const fam = groupList.find(g => fold(g.sur) === fold(c.prezime));
     head = `<div class="eyebrow">Nova osoba bez roditelja · ${fam ? `ide u porodicu ${esc(fam.sur)}` : 'novo prezime u stablu'}</div>
@@ -544,7 +556,8 @@ $('revBody').addEventListener('click', async e => {
     if (b.dataset.do === 'approve') {
       const { data, error } = await sb.rpc('approve_suggestion', { sid });
       if (error) throw error;
-      if (people.has(data.id)) { applyRow(data); render(); } else reloadTo = data.id;
+      // an approved edit shows at once; a new person or a new marriage link reloads onto them when the queue closes
+      if (people.has(data.id) && (data.brak_id ?? null) === (people.get(data.id).brak ?? null)) { applyRow(data); render(); } else reloadTo = data.id;
     } else {
       const { error } = await sb.rpc('reject_suggestion', { sid });
       if (error) throw error;
