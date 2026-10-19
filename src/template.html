@@ -277,6 +277,65 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .top .btn:not(.icon) { min-width: 34px; padding: 0 8px; justify-content: center; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+/* print sheets: one fixed paper look (black ink on white), whatever the screen theme */
+:root { --paper: #ffffff; --p-ink: #151515; --p-muted: #5a5a5a; --p-line: #8c8c8c; --p-box: #b5b5b5; --p-tint: #f2f2ef; }
+.sheet { box-sizing: border-box; background: var(--paper); color: var(--p-ink); display: flex; flex-direction: column; overflow: hidden; font-family: var(--f-body); }
+.sheet .ph { height: 17mm; flex: none; box-sizing: border-box; display: flex; justify-content: space-between; align-items: flex-start; gap: 6mm; border-bottom: .3mm solid var(--p-ink); padding-bottom: 2mm; }
+.sheet .pk { font: 500 2.3mm/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--p-muted); }
+.sheet h1 { margin: 1.6mm 0 0; font: 500 6.2mm/1.1 var(--f-display); letter-spacing: -.01em; }
+.sheet h1 span { font: 400 3.4mm var(--f-mono); color: var(--p-muted); }
+.sheet .pm { font-size: 2.5mm; line-height: 1.5; color: var(--p-muted); text-align: right; }
+.sheet .pbody { flex: 1; min-height: 0; padding-top: 1.5mm; }
+.sheet .pf { height: 7mm; flex: none; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: space-between; gap: 4mm; font-size: 2.3mm; color: var(--p-muted); border-top: .2mm solid var(--p-box); }
+.ptree { display: block; overflow: visible; }
+.ptree .pl { fill: none; stroke: var(--p-line); stroke-width: .25; stroke-linecap: square; }
+.ptree .pb { fill: var(--paper); stroke: var(--p-box); stroke-width: .25; }
+.ptree .pb.an { fill: var(--p-tint); }
+.ptree .pb.me { fill: var(--p-tint); stroke: var(--p-ink); stroke-width: .55; }
+.ptree .pn { font-family: var(--f-display); font-weight: 500; fill: var(--p-ink); }
+.ptree .pn.me { font-weight: 600; }
+.ptree .pd { font-family: var(--f-body); fill: var(--p-muted); }
+.ptree .pb.gh { fill: none; stroke-dasharray: .8 .6; }
+.ptree .pd.gh { font-style: italic; }
+:root { --p-bark: #5b4535; --p-leaf: #6a7a36; --p-leaf-tint: #eef1e2; }
+.otree .br { fill: none; stroke: var(--p-bark); stroke-linecap: round; }
+.otree .trunk { fill: var(--p-bark); }
+.otree .ground { fill: none; stroke: var(--p-bark); stroke-width: .3; stroke-linecap: round; }
+.otree .lf { fill: var(--p-leaf); }
+.otree .kn { fill: var(--paper); stroke: var(--p-bark); stroke-width: .35; }
+.otree .kn.me { stroke: var(--p-ink); stroke-width: .6; }
+.otree .pill { fill: var(--paper); stroke: var(--p-bark); stroke-width: .3; }
+.otree .pill.lf { fill: var(--p-leaf-tint); stroke: var(--p-leaf); }
+.otree .pill.an { fill: var(--p-tint); }
+.otree .pill.me { fill: var(--p-tint); stroke: var(--p-ink); stroke-width: .55; }
+.otree .pn2 { font-family: var(--f-display); font-weight: 500; fill: var(--p-ink); }
+.otree .pn2.me, .otree .pn2.an { font-weight: 600; }
+.otree .lb { font-family: var(--f-display); fill: var(--p-ink); paint-order: stroke; stroke: var(--paper); stroke-width: .75; stroke-linejoin: round; }
+.otree .lb.in { font-weight: 600; }
+.otree .lb.me { font-weight: 600; }
+.otree .yr { font-family: var(--f-mono); fill: var(--p-muted); }
+.ptree .tr { fill: none; stroke: var(--p-ink); stroke-width: .7; stroke-linecap: round; }
+.ptree .pt { font-family: var(--f-display); font-weight: 500; fill: var(--p-ink); }
+.ptree .pk2 { font-family: var(--f-mono); fill: var(--p-muted); letter-spacing: .08em; }
+.sheet .pbody.tile { outline: .25mm dashed var(--p-box); outline-offset: 0; }
+.ptree .pg { font-family: var(--f-mono); fill: var(--p-muted); letter-spacing: .04em; }
+#printOut { display: none; }
+.popts { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; margin: 0; }
+.popts .fld { min-width: 140px; }
+.popts .chk { display: flex; align-items: center; gap: 8px; font-size: 13.5px; padding-bottom: 9px; cursor: pointer; }
+.popts .chk input { accent-color: var(--accent); }
+.popts .pcount { margin-left: auto; font: 12px var(--f-mono); color: var(--muted); padding-bottom: 10px; font-variant-numeric: tabular-nums; }
+.pprev { background: var(--line); border-radius: 8px; padding: 12px; max-height: min(56vh, 640px); overflow: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.pprev .sheet { zoom: var(--z, .5); flex: none; box-shadow: 0 2px 12px rgba(0, 0, 0, .28); }
+.hint { margin: 0; font-size: 12.5px; color: var(--muted); max-width: 70ch; }
+@media print {
+  html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
+  body.printing > :not(#printOut) { display: none !important; }
+  body.printing #printOut { display: block; }
+  #printOut .sheet { break-after: page; }
+  #printOut .sheet:last-child { break-after: auto; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
 </style>
 
 <div class="app">
@@ -315,6 +374,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 <dialog class="dlg" id="dEdit"></dialog>
 <dialog class="dlg" id="dLogin"></dialog>
 <dialog class="dlg wide" id="dReview"></dialog>
+<dialog class="dlg wide" id="dPrint"></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.79.0/dist/umd/supabase.js"></script>
 <script>
@@ -364,7 +424,22 @@ const T = {
     delLede: 'Brisanje se odmah primenjuje. Obrisani zapis ostaje sačuvan u tabeli deleted_people u Supabase-u.',
     delOnly: (n, up) => up ? `Samo ovu osobu. ${n === 1 ? 'Dete se premešta' : 'Deca (' + n + ') se premeštaju'} pod:`
       : `Samo ovu osobu. ${n === 1 ? 'Dete postaje začetnik loze.' : 'Deca (' + n + ') postaju začetnici loza.'}`,
-    delAll: n => `Ovu osobu i sve potomke (ukupno ${fmt(n)} osoba)`
+    delAll: n => `Ovu osobu i sve potomke (ukupno ${fmt(n)} osoba)`,
+    print: 'Štampaj', printTitle: 'Štampanje', paper: 'Papir', orient: 'Položaj', landscape: 'Položeno', portrait: 'Uspravno',
+    printLede: 'Preci izabrane osobe i svi njeni potomci, složeni po generacijama s leva na desno.',
+    spouses: 'Prikaži supružnike', printDoc: 'Preci i potomci', printCount: (a, d) => `preci: ${a} · potomci: ${fmt(d)}`,
+    pages: n => `${n} ${n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'strane' : 'strana'}`,
+    pageOf: (i, n) => `Strana ${i} od ${n}`, genShort: g => `${g}. generacija`,
+    printHint: 'U prozoru za štampu izaberite isti papir, razmeru 100% (bez prilagođavanja) i isključite zaglavlja i podnožja.',
+    ledeDown: 'Prvi predak je na vrhu, svaka generacija je red niže, a izabrana osoba i svi njeni potomci se granaju ispod.',
+    ledeTree: 'Prvi predak je koren, preci čine stablo do izabrane osobe, a njeni potomci su krošnja. Staje na jedan list.',
+    nodes: 'Čvorovi', nodePill: 'Imena u čvorovima', nodeDot: 'Male tačke',
+    layout: 'Raspored', layLR: 'S leva na desno', layDown: 'Grafikon, koren gore', layTree: 'Stablo',
+    fit: 'Smanji na jednu stranu', treeDoc: 'Porodično stablo',
+    tileOf: (k, n, r, c) => `Deo ${k} od ${n} · red ${r}, kolona ${c}`,
+    tiled: (n, r, c) => `${r} × ${c} listova za lepljenje`,
+    tinyType: 'slova su vrlo sitna',
+    tileHint: 'Veliko stablo se štampa kao plakat na više listova: odsecite margine po isprekidanoj liniji i zalepite listove po redovima i kolonama.'
   },
   en: {
     search: 'Search name, surname, place or year…', home: 'Overview',
@@ -403,7 +478,22 @@ const T = {
     delLede: 'Deleting applies right away. A copy of each deleted record is kept in the deleted_people table in Supabase.',
     delOnly: (n, up) => up ? `Only this person. ${n === 1 ? 'Their child moves' : 'Their ' + n + ' children move'} under:`
       : `Only this person. ${n === 1 ? 'Their child becomes the founder of a line.' : 'Their ' + n + ' children become founders of their own lines.'}`,
-    delAll: n => `This person and all descendants (${fmt(n)} people in total)`
+    delAll: n => `This person and all descendants (${fmt(n)} people in total)`,
+    print: 'Print', printTitle: 'Print', paper: 'Paper', orient: 'Orientation', landscape: 'Landscape', portrait: 'Portrait',
+    printLede: 'The selected person’s ancestors and all of their descendants, laid out by generation from left to right.',
+    spouses: 'Show spouses', printDoc: 'Ancestors and descendants', printCount: (a, d) => `ancestors: ${a} · descendants: ${fmt(d)}`,
+    pages: n => `${n} ${n === 1 ? 'page' : 'pages'}`,
+    pageOf: (i, n) => `Page ${i} of ${n}`, genShort: g => `Generation ${g}`,
+    printHint: 'In the print dialog choose the same paper, 100% scale (no fit to page), and turn off headers and footers.',
+    ledeDown: 'The first ancestor is at the top, each generation one row lower, with the selected person and all of their descendants branching below.',
+    ledeTree: 'The first ancestor is the root, the ancestors form the trunk up to the selected person, and their descendants are the crown. Fits on one sheet.',
+    nodes: 'Nodes', nodePill: 'Names inside nodes', nodeDot: 'Small dots',
+    layout: 'Layout', layLR: 'Left to right', layDown: 'Chart, root at top', layTree: 'Tree',
+    fit: 'Shrink to one page', treeDoc: 'Family tree',
+    tileOf: (k, n, r, c) => `Part ${k} of ${n} · row ${r}, column ${c}`,
+    tiled: (n, r, c) => `${r} × ${c} sheets to tape together`,
+    tinyType: 'the type is very small',
+    tileHint: 'A large tree prints as a poster on several sheets: trim the margins along the dashed line and tape the sheets together by row and column.'
   }
 };
 let lang = 'sr';
@@ -828,7 +918,7 @@ function renderPanel() {
       <div><h2 class="name">${fullName(p)}</h2>
         ${bits.length ? `<p class="sub">${bits.join(' · ')}</p>` : ''}
         <div class="pills">${desc ? `<span class="pill">${fmt(desc)} ${esc(t('descendants'))}</span>` : ''}${!par ? `<span class="pill">${esc(t('lineRoot'))}</span>` : ''}</div>
-        <div class="acts"><button type="button" class="btn" data-act="edit"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"></path></svg>${esc(t('edit'))}</button><button type="button" class="btn" data-act="child"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>${esc(t('addChild'))}</button>${isAdmin ? `<button type="button" class="btn danger" data-act="delete"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5"></path></svg>${esc(t('del'))}</button>` : ''}</div>
+        <div class="acts"><button type="button" class="btn" data-act="edit"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"></path></svg>${esc(t('edit'))}</button><button type="button" class="btn" data-act="child"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>${esc(t('addChild'))}</button><button type="button" class="btn" data-act="print"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4.5 6V2.5h7V6M4.5 11.5h-2v-5h11v5h-2M4.5 9.5h7v4h-7z"></path></svg>${esc(t('print'))}</button>${isAdmin ? `<button type="button" class="btn danger" data-act="delete"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5"></path></svg>${esc(t('del'))}</button>` : ''}</div>
       </div>`;
     const facts = [];
     if (p.sup) facts.push([t('spouse'), esc(p.sup)]);
@@ -850,6 +940,7 @@ panelIn.addEventListener('click', e => {
     if (act === 'login') openLogin();
     else if (act === 'new') openNew(nodes[sel].kind === 'group' ? nodes[sel].group.sur : '');
     else if (act === 'delete') openDelete(nodes[sel].p);
+    else if (act === 'print') openPrint(nodes[sel].p);
     else openEdit(nodes[sel].p, act === 'child');
     return;
   }
@@ -1160,6 +1251,533 @@ dReview.addEventListener('click', async e => {
   }
 });
 document.getElementById('bReview').onclick = openReview;
+
+/* ---------- print: the selected person's ancestors and everyone below them, on paper ----------
+   Generations are columns (left to right). Ancestors form a straight line into the selected person;
+   each parent sits on the row of its first child, so every person owns whole rows and pages break
+   between rows, never through a name. Sizes are in millimetres throughout. */
+const dPrint = document.getElementById('dPrint');
+{
+  let downOutside = false;
+  dPrint.addEventListener('pointerdown', e => { downOutside = e.target === dPrint && outsideBox(dPrint, e); });
+  dPrint.addEventListener('click', e => {
+    if (e.target.closest('[data-close]')) dPrint.close();
+    else if (e.target === dPrint && downOutside && outsideBox(dPrint, e)) dPrint.close();
+    downOutside = false;
+  });
+}
+const PAPER = { A4: [210, 297], Letter: [215.9, 279.4], A3: [297, 420] };
+const printOpts = { size: 'A4', orient: 'landscape', spouses: false, layout: 'lr', fit: false, nodes: 'pill' };
+try { Object.assign(printOpts, JSON.parse(localStorage.getItem('stablo.print') || '{}')); } catch (e) {}
+if (!PAPER[printOpts.size]) printOpts.size = 'A4';
+if (printOpts.layout === 'up') printOpts.layout = 'tree';
+if (!['lr', 'down', 'tree'].includes(printOpts.layout)) printOpts.layout = 'lr';
+if (!['pill', 'dot'].includes(printOpts.nodes)) printOpts.nodes = 'pill';
+const PX_MM = 96 / 25.4;
+const NAME_FONT = s => `500 ${s}px Spectral, Georgia, serif`;
+const DET_FONT = s => `400 ${s}px "Instrument Sans", "Segoe UI", system-ui, sans-serif`;
+const measure = document.createElement('canvas').getContext('2d');
+// shorten text with an ellipsis until it fits maxMm at sizeMm
+function fitText(text, font, sizeMm, maxMm) {
+  measure.font = font(sizeMm * PX_MM * 4);
+  const w = x => measure.measureText(x).width / (PX_MM * 4);
+  if (w(text) <= maxMm) return text;
+  let lo = 0, hi = text.length;
+  while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (w(text.slice(0, mid) + '…') <= maxMm) lo = mid; else hi = mid - 1; }
+  return text.slice(0, lo).trimEnd() + '…';
+}
+function printLayout(p, o) {
+  const [w0, h0] = PAPER[o.size];
+  const [pw, ph] = o.orient === 'landscape' ? [h0, w0] : [w0, h0];
+  const M = 10, HEAD = 17, FOOT = 7, GENH = 6;
+  const W = pw - 2 * M;
+  const anc = [];
+  for (let q = p.par != null ? people.get(p.par) : null; q; q = q.par != null ? people.get(q.par) : null) anc.unshift(q);
+  const items = anc.map((a, i) => ({ p: a, col: i, row: 0, anc: true, kids: [] }));
+  let row = 0, maxCol = anc.length;
+  const place = (q, col) => {
+    const it = { p: q, col, row, kids: [] };
+    items.push(it); maxCol = Math.max(maxCol, col);
+    if (q.kids.length) for (const k of q.kids) it.kids.push(place(k, col + 1)); else row++;
+    return it;
+  };
+  const me = place(p, anc.length); me.me = true;
+  const rows = row, cols = maxCol + 1;
+  const NAT = 48;                                   // a comfortable column at full type size
+  const colW = Math.min(NAT * 1.3, W / cols);
+  const fs = Math.max(0.6, Math.min(1, colW / NAT));  // type shrinks for many generations, but stays legible
+  const gap = Math.max(3.5, 7 * fs), boxW = colW - gap;
+  const nameS = 3.2 * fs, detS = 2.35 * fs, rowH = (o.spouses ? 12.6 : 9.6) * fs;
+  const first = Math.max(1, Math.floor((ph - 2 * M - HEAD - FOOT - GENH - 1.5) / rowH));
+  const next = Math.max(1, Math.floor((ph - 2 * M - FOOT - GENH - 1.5) / rowH));
+  const pages = [[0, Math.min(rows, first)]];
+  while (pages[pages.length - 1][1] < rows) { const a = pages[pages.length - 1][1]; pages.push([a, Math.min(rows, a + next)]); }
+  return { p, o, pw, ph, M, W, GENH, items, anc, cols, colW, boxW, gap, fs, nameS, detS, rowH, pages };
+}
+function sheetSvg(L, a, b) {
+  const { colW, boxW, rowH, GENH, nameS, detS, fs } = L;
+  const yc = r => GENH + (r - a + 0.5) * rowH;
+  const H = GENH + (b - a) * rowH;
+  const g0 = (L.anc[0] || L.p).gen;
+  let s = `<svg class="ptree" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${L.W} ${H}" width="${L.W}mm" height="${H}mm">`;
+  // a branch that started on an earlier page gets a dashed reminder of the parent on this page's first row
+  const carried = L.items.filter(it => !it.anc && it.kids.length && it.row < a && it.kids[it.kids.length - 1].row >= a);
+  const used = new Set(carried.map(it => it.col));
+  for (const it of L.items) if (it.row >= a && it.row < b && !(it.anc && a !== 0)) used.add(it.col);
+  for (let c = 0; c < L.cols; c++) if (used.has(c))
+    s += `<text class="pg" x="${c * colW + 0.4}" y="${GENH - 2.2}" font-size="${Math.max(1.9, detS * 0.86)}">${esc(fitText(t('genShort')(g0 + c), DET_FONT, Math.max(1.9, detS * 0.86), boxW))}</text>`;
+  let d = '';
+  for (const it of L.items) {
+    if (it.anc) { if (a === 0) d += `M${it.col * colW + boxW} ${yc(0)}H${(it.col + 1) * colW}`; continue; }
+    if (!it.kids.length) continue;
+    const r0 = it.row, r1 = it.kids[it.kids.length - 1].row;
+    if (r1 < a || r0 >= b) continue;
+    const xr = it.col * colW + boxW, mx = xr + L.gap / 2, xc = (it.col + 1) * colW;
+    if (r0 >= a) d += `M${xr} ${yc(r0)}H${mx}`;
+    // a branch that runs on onto the next page reaches the bottom edge
+    if (r0 < a) d += `M${xr} ${yc(a)}H${mx}`;
+    d += `M${mx} ${yc(Math.max(r0, a))}V${r1 < b ? yc(r1) : H}`;
+    for (const k of it.kids) if (k.row >= a && k.row < b) d += `M${mx} ${yc(k.row)}H${xc}`;
+  }
+  s += `<path class="pl" d="${d}"/>`;
+  const pad = 1.5 * fs, tw = boxW - 2 * pad;
+  for (const it of carried) {
+    const q = it.p, x = it.col * colW, y = GENH + 0.7 * fs, h = rowH - 1.4 * fs;
+    s += `<rect class="pb gh" x="${x}" y="${y}" width="${boxW}" height="${h}" rx="${1.1 * fs}"/>`;
+    s += `<text class="pd gh" x="${x + pad}" y="${y + 1.1 * fs + nameS * 0.8}" font-size="${nameS * 0.92}">${esc(fitText('↑ ' + plainName(q), DET_FONT, nameS * 0.92, tw))}</text>`;
+  }
+  for (const it of L.items) {
+    if (it.row < a || it.row >= b || (it.anc && a !== 0)) continue;
+    const q = it.p, parent = q.par != null ? people.get(q.par) : null;
+    const x = it.col * colW, y = GENH + (it.row - a) * rowH + 0.7 * fs, h = rowH - 1.4 * fs;
+    const showSur = it.anc || it.me || !parent || parent.prez !== q.prez;
+    const name = `${q.ime}${q.nad ? ` „${q.nad}”` : ''}${showSur && q.prez ? ' ' + q.prez : ''}`;
+    const det = [q.god != null ? yr(q.god) : '', q.mesto || q.opis].filter(Boolean).join(' · ');
+    const y1 = y + 1.1 * fs + nameS * 0.8;
+    s += `<rect class="pb${it.me ? ' me' : it.anc ? ' an' : ''}" x="${x}" y="${y}" width="${boxW}" height="${h}" rx="${1.1 * fs}"/>`;
+    s += `<text class="pn${it.me ? ' me' : ''}" x="${x + pad}" y="${y1}" font-size="${nameS}">${esc(fitText(name, NAME_FONT, nameS, tw))}</text>`;
+    if (det) s += `<text class="pd" x="${x + pad}" y="${y1 + detS * 1.3}" font-size="${detS}">${esc(fitText(det, DET_FONT, detS, tw))}</text>`;
+    if (L.o.spouses && q.sup) s += `<text class="pd" x="${x + pad}" y="${y1 + detS * 2.6}" font-size="${detS}">${esc(fitText('∞ ' + q.sup, DET_FONT, detS, tw))}</text>`;
+  }
+  return s + '</svg>';
+}
+function sheetsHtml(L) {
+  const n = L.pages.length;
+  const today = new Date().toLocaleDateString(lang === 'sr' ? 'sr-Latn' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  return L.pages.map(([a, b], i) => `<section class="sheet" style="width:${L.pw}mm;height:${L.ph}mm;padding:${L.M}mm">
+    ${i === 0 ? `<header class="ph"><div><div class="pk">${esc(t('printDoc'))}</div><h1>${esc(plainName(L.p))}${L.p.god != null ? ` <span>${esc(yr(L.p.god))}</span>` : ''}</h1></div>
+      <div class="pm">${esc(CFG.title)}<br>${esc(t('printCount')(L.anc.length, L.p.size - 1))} · ${esc(today)}</div></header>` : ''}
+    <div class="pbody">${sheetSvg(L, a, b)}</div>
+    <footer class="pf"><span>${esc(plainName(L.p))} · ${esc(t('printDoc').toLowerCase())}</span><span>${esc(t('pageOf')(i + 1, n))}</span></footer>
+  </section>`).join('');
+}
+/* Tree layouts: the first ancestor is the root, each generation one row further away, every parent centred
+   over its children. 'down' grows from the top of the sheet, 'up' grows from the bottom like a real tree.
+   The direct line from the root to the selected person is the trunk. A tree wider or taller than one sheet
+   prints as a poster: the same drawing is cut into sheet-sized tiles that are taped together. */
+function treeLayout(p, o) {
+  const [w0, h0] = PAPER[o.size];
+  const [pw, ph] = o.orient === 'landscape' ? [h0, w0] : [w0, h0];
+  const M = 10, FOOT = 7, TITLE = 22;
+  const aw = pw - 2 * M, ah = ph - 2 * M - FOOT;
+  const up = o.layout === 'up';
+  const anc = [];
+  for (let q = p.par != null ? people.get(p.par) : null; q; q = q.par != null ? people.get(q.par) : null) anc.unshift(q);
+  const bw = 27, gapX = 3, sw = bw + gapX, IND = 3.2;       // IND: how far stacked siblings sit right of their spine
+  const nameS = 2.95, surS = 2.6, detS = 2.1, pad = 1.4;
+  const l1 = pad + nameS * 0.8, l2 = l1 + surS * 1.22, l3 = l2 + detS * 1.4, l4 = l3 + detS * 1.3;
+  const bh = (o.spouses ? l4 : l3) + 1.4, rh = bh + 8, sh = bh + 2;
+  /* Positions are worked out top-down in "offset" space (off = distance from the root's row) and mirrored for 'up'.
+     Children without children of their own that follow each other are stacked in one column under the
+     parent instead of side by side: the tree stays narrow and birth order is kept. */
+  /* A tidy tree: each family is built as a unit with its outline per generation (the leftmost and rightmost
+     edge of its boxes on each row), and the next sibling's unit moves right only as far as it must to clear
+     that outline on every row they share. Shallow branches therefore tuck in next to deep ones. */
+  const bar = d => d * rh - (rh - bh) / 2;     // the horizontal line above row d
+  const shiftUnit = (u, dx) => {
+    for (const b of u.boxes) b.x += dx;
+    for (const pl of u.lines) for (const v of pl) v[0] += dx;
+    for (const L in u.cont) { u.cont[L][0] += dx; u.cont[L][1] += dx; }
+    u.top += dx;
+  };
+  const leafUnit = (q, d) => ({ boxes: [{ q, x: 0, off: d * rh, w: bw }], lines: [], cont: { [d]: [0, bw] }, top: bw / 2 });
+  const stackUnit = (ks, d) => {
+    const spine = 1.2, lastMid = d * rh + (ks.length - 1) * sh + bh / 2, end = lastMid + bh / 2;
+    const u = { stack: true, boxes: [], lines: [[[spine, bar(d)], [spine, lastMid]]], cont: {}, top: spine };
+    ks.forEach((k, i) => {
+      u.boxes.push({ q: k, x: IND, off: d * rh + i * sh, w: bw - IND });
+      u.lines.push([[spine, d * rh + i * sh + bh / 2], [IND, d * rh + i * sh + bh / 2]]);
+    });
+    for (let L = d; L * rh < end + (rh - bh); L++) u.cont[L] = [0, bw];
+    return u;
+  };
+  const treeUnit = (q, d) => {
+    if (!q.kids.length) return leafUnit(q, d);
+    const runs = [];
+    for (const k of q.kids) {
+      const leaf = !k.kids.length, last = runs[runs.length - 1];
+      if (leaf && last && last.leaves) last.ks.push(k); else runs.push({ leaves: leaf, ks: [k] });
+    }
+    const units = [];
+    for (const r of runs) {
+      if (r.leaves && r.ks.length > 1) units.push(stackUnit(r.ks, d + 1));
+      else for (const k of r.ks) units.push(treeUnit(k, d + 1));
+    }
+    const u = { boxes: [], lines: [], cont: {}, top: 0 }, tops = [];
+    for (const c of units) {
+      let dx = 0;
+      if (tops.length) {
+        dx = -Infinity;
+        for (const L in c.cont) if (u.cont[L]) dx = Math.max(dx, u.cont[L][1] + gapX - c.cont[L][0]);
+      }
+      shiftUnit(c, dx);
+      u.boxes.push(...c.boxes); u.lines.push(...c.lines);
+      for (const L in c.cont) u.cont[L] = u.cont[L] ? [Math.min(u.cont[L][0], c.cont[L][0]), Math.max(u.cont[L][1], c.cont[L][1])] : c.cont[L];
+      if (!c.stack) u.lines.push([[c.top, bar(d + 1)], [c.top, (d + 1) * rh]]);
+      tops.push(c.top);
+    }
+    const cx = (tops[0] + tops[tops.length - 1]) / 2;
+    u.boxes.push({ q, x: cx - bw / 2, off: d * rh, w: bw });
+    u.cont[d] = [cx - bw / 2, cx + bw / 2];
+    u.lines.push([[cx, d * rh + bh], [cx, bar(d + 1)]]);
+    if (tops.length > 1) u.lines.push([[tops[0], bar(d + 1)], [tops[tops.length - 1], bar(d + 1)]]);
+    u.top = cx;
+    return u;
+  };
+  const root = treeUnit(p, anc.length);
+  const boxes = root.boxes, lines = root.lines, trunk = [];
+  for (const b of boxes) b.me = b.q === p;
+  const meX = root.top;
+  // the ancestors stand in one straight line leading to the selected person: the trunk
+  anc.forEach((a, i) => {
+    boxes.push({ q: a, x: meX - bw / 2, off: i * rh, w: bw, anc: true });
+    trunk.push([[meX, i * rh + bh], [meX, (i + 1) * rh]]);
+  });
+  let maxOff = 0, minX = Infinity, maxX = -Infinity;
+  for (const b of boxes) { maxOff = Math.max(maxOff, b.off + bh); minX = Math.min(minX, b.x); maxX = Math.max(maxX, b.x + b.w); }
+  const shift = -minX;
+  const Wd = Math.max(maxX - minX, 120), Hd = TITLE + maxOff;
+  const Y = off => TITLE + (up ? maxOff - off : off);       // a point
+  const by = b => up ? TITLE + maxOff - b.off - bh : TITLE + b.off;  // a box's top edge
+  const path = pls => pls.map(pl => pl.map(([x, off], i) => `${i ? 'L' : 'M'}${(x + shift).toFixed(2)} ${Y(off).toFixed(2)}`).join('')).join('');
+  let g = `<path class="pl" d="${path(lines)}"/><path class="tr" d="${path(trunk)}"/>`;
+  const rects = [], segs = [...lines, ...trunk].map(pl => {
+    const xs = pl.map(v => v[0] + shift), ys = pl.map(v => Y(v[1]));
+    return [Math.min(...xs) - 0.5, Math.min(...ys) - 0.5, Math.max(...xs) + 0.5, Math.max(...ys) + 0.5];
+  });
+  for (const b of boxes) {
+    const q = b.q, parent = q.par != null ? people.get(q.par) : null;
+    const x = b.x + shift, y = by(b), cx = x + b.w / 2, tw = b.w - 2 * pad;
+    const showSur = b.anc || b.me || !parent || parent.prez !== q.prez;
+    const first = `${q.ime}${q.nad ? ` „${q.nad}”` : ''}`;
+    const det = [q.god != null ? yr(q.god) : '', q.mesto || q.opis].filter(Boolean).join(' · ');
+    rects.push([x, y, x + b.w, y + bh]);
+    g += `<rect class="pb${b.me ? ' me' : b.anc ? ' an' : ''}" x="${x}" y="${y}" width="${b.w}" height="${bh}" rx="1.1"/>`;
+    g += `<text class="pn${b.me ? ' me' : ''}" x="${cx}" y="${y + l1}" font-size="${nameS}" text-anchor="middle">${esc(fitText(first, NAME_FONT, nameS, tw))}</text>`;
+    if (showSur && q.prez) g += `<text class="pn" x="${cx}" y="${y + l2}" font-size="${surS}" text-anchor="middle">${esc(fitText(q.prez, NAME_FONT, surS, tw))}</text>`;
+    if (det) g += `<text class="pd" x="${cx}" y="${y + l3}" font-size="${detS}" text-anchor="middle">${esc(fitText(det, DET_FONT, detS, tw))}</text>`;
+    if (o.spouses && q.sup) g += `<text class="pd" x="${cx}" y="${y + l4}" font-size="${detS}" text-anchor="middle">${esc(fitText('∞ ' + q.sup, DET_FONT, detS, tw))}</text>`;
+  }
+  // title block in the top-left corner
+  const today = new Date().toLocaleDateString(lang === 'sr' ? 'sr-Latn' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  g += `<text class="pk2" x="0" y="3.4" font-size="2.3">${esc(t('treeDoc').toUpperCase())}</text>`;
+  g += `<text class="pt" x="0" y="11" font-size="6.2">${esc(plainName(p))}${p.god != null ? ` <tspan class="pd" font-size="3.4">${esc(yr(p.god))}</tspan>` : ''}</text>`;
+  g += `<text class="pd" x="0" y="16.2" font-size="2.5">${esc(CFG.title)} · ${esc(t('printCount')(anc.length, p.size - 1))} · ${esc(today)}</text>`;
+  rects.push([0, 0, 110, 17]);
+  // one sheet, or a poster of tiles
+  const scale = o.fit ? Math.min(1, aw / Wd, ah / Hd) : 1;
+  const tw = aw / scale, th = ah / scale;
+  const ncol = Math.max(1, Math.ceil(Wd / tw - 1e-6)), nrow = Math.max(1, Math.ceil(Hd / th - 1e-6));
+  const x0 = ncol === 1 ? -(tw - Wd) / 2 : 0;          // a tree narrower than the sheet sits in the middle
+  const y0 = nrow === 1 && up ? -(th - Hd) : 0;        // a short 'up' tree stands on the bottom edge
+  const hit = (r, a) => r[0] < a[2] && r[2] > a[0] && r[1] < a[3] && r[3] > a[1];
+  const tiles = [];
+  for (let r = 0; r < nrow; r++) for (let c = 0; c < ncol; c++) {
+    const a = [x0 + c * tw, y0 + r * th, x0 + (c + 1) * tw, y0 + (r + 1) * th];
+    if (rects.some(b => hit(b, a)) || segs.some(sg => hit(sg, a))) tiles.push({ r, c, a });
+  }
+  return { kind: 'tree', p, o, pw, ph, M, aw, ah, g, tiles, ncol, nrow, scale, tw, th };
+}
+function treeSheetsHtml(L) {
+  const n = L.tiles.length, poster = L.ncol * L.nrow > 1;
+  return L.tiles.map((tl, i) => `<section class="sheet" style="width:${L.pw}mm;height:${L.ph}mm;padding:${L.M}mm">
+    <div class="pbody${poster ? ' tile' : ''}" style="padding:0"><svg class="ptree" xmlns="http://www.w3.org/2000/svg" viewBox="${tl.a[0]} ${tl.a[1]} ${L.tw} ${L.th}" width="${L.aw}mm" height="${L.ah}mm">${L.g}</svg></div>
+    <footer class="pf"><span>${esc(plainName(L.p))} · ${esc(t('treeDoc').toLowerCase())}</span><span>${esc(poster ? t('tileOf')(i + 1, n, tl.r + 1, tl.c + 1) : t('pageOf')(1, 1))}</span></footer>
+  </section>`).join('');
+}
+/* The drawn tree with small circles for nodes (the "Tačke" style): the first ancestor is the foot of the trunk and every later ancestor sits on the trunk
+   up to the selected person, where the crown begins. The crown is a fan of curved branches: each person
+   gets a slice of the fan in proportion to how many leaves (people without children) hang below them, and
+   a branch is as thick as the family it carries. People without children are leaves near the rim. It always
+   fits on one sheet; the type shrinks for large families. */
+function organicDotsLayout(p, o) {
+  const [w0, h0] = PAPER[o.size];
+  const [pw, ph] = o.orient === 'landscape' ? [h0, w0] : [w0, h0];
+  const M = 10, FOOT = 7, TITLE = 20;
+  const aw = pw - 2 * M, ah = ph - 2 * M - FOOT;
+  const anc = [];
+  for (let q = p.par != null ? people.get(p.par) : null; q; q = q.par != null ? people.get(q.par) : null) anc.unshift(q);
+  const leaves = new Map(), depth = new Map();
+  const count = q => { let n = 0, d = 0; for (const k of q.kids) { n += count(k); d = Math.max(d, depth.get(k) + 1); } leaves.set(q, n || 1); depth.set(q, d); return n || 1; };
+  const total = count(p), D = Math.max(1, depth.get(p));
+  const A0 = 10 * Math.PI / 180, A1 = 170 * Math.PI / 180;     // the crown's fan, measured from the right, 90° = straight up
+  const parentOf = q => q.par != null ? people.get(q.par) : null;
+  const nameOf = q => { const par = parentOf(q); return `${q.ime}${q.nad ? ` „${q.nad}”` : ''}${!par || par.prez !== q.prez || q === p ? ' ' + q.prez : ''}`; };
+  /* The longest label that fits the room along the branch: name and year, then the name alone, then the
+     first name with the nickname, then the first name. The first name is always written out in full, even
+     where it runs over a branch; the year is the first thing to go. */
+  const treeLabel = (q, size, room) => {
+    const w = (txt, font, sz) => { measure.font = font(sz * PX_MM * 4); return measure.measureText(txt).width / (PX_MM * 4); };
+    const year = q.god != null ? String(q.god) : '', yW = year ? w(' ' + year, DET_FONT, Math.max(1.9, size * 0.82)) : 0;
+    const opts = [[nameOf(q), year], [nameOf(q), ''], [`${q.ime}${q.nad ? ` „${q.nad}”` : ''}`, ''], [q.ime, '']];
+    for (const [nm, y] of opts) if (w(nm, NAME_FONT, size) + (y ? yW : 0) <= room) return { nm, yrTxt: y };
+    return { nm: q.ime, yrTxt: '' };
+  };
+  const all = [];
+  (function walk(q) { all.push(q); q.kids.forEach(walk); })(p);
+  // type size: leaves must not touch along the rim, and the rim leaves room for the longest names
+  const trunkStep = 8, trunkH = (anc.length ? anc.length * trunkStep : 0) + 9;
+  let fs = 2.7, Ry = 40, Rx = 40, Lr = 30;
+  for (let pass = 0; pass < 3; pass++) {
+    measure.font = NAME_FONT(fs * PX_MM * 4);
+    const longest = Math.max(...all.filter(q => !q.kids.length).map(q => measure.measureText(nameOf(q) + ' 0000').width / (PX_MM * 4)), 10);
+    Lr = Math.min(longest, 34 * fs / 2.7) + 2.5;
+    Ry = Math.max(25, ah - TITLE - trunkH - Lr - 3);
+    Rx = Math.max(25, Math.min((aw - 2 * Lr) / 2, Ry * 1.7));
+    Ry = Math.min(Ry, Rx * 2.2);                                // a portrait sheet gets a tall, narrow crown
+    fs = Math.max(1.45, Math.min(2.9, (0.85 * (Rx + Ry) / 2 * (A1 - A0) / total) / 1.18));
+  }
+  const cx = aw / 2, cy = ah - trunkH;                           // where the trunk ends and the crown begins
+  // distance from the trunk as a fraction of the crown: parents spread evenly, leaves sit in the outer band
+  const rOf = (q, d, rPar) => q.kids.length ? 0.26 + 0.6 * d / D : Math.max(0.64 + 0.36 * d / D, rPar + 0.16);
+  const nodes = [];
+  (function assign(q, a0, a1, d, rPar, par) {
+    const a = (a0 + a1) / 2, r = q === p ? 0 : rOf(q, d, rPar);
+    const n = { q, r, d, par, x: cx + Rx * r * Math.cos(a), y: cy - Ry * r * Math.sin(a) };
+    n.a = q === p ? Math.PI / 2 : Math.atan2(cy - n.y, n.x - cx);   // the direction the branch points on paper
+    nodes.push(n);
+    let at = a0;
+    for (const k of q.kids) { const w = (a1 - a0) * leaves.get(k) / leaves.get(q); assign(k, at, at + w, d + 1, r, n); at += w; }
+  })(p, A0, A1, 0, 0, null);
+  const f2 = v => v.toFixed(2);
+  let g = '';
+  // branches, thickest first so the fine twigs sit on top
+  const branches = nodes.filter(n => n.par).sort((a, b) => leaves.get(b.q) - leaves.get(a.q));
+  for (const n of branches) {
+    const P = n.par, w = 0.28 + 2.5 * Math.sqrt(leaves.get(n.q) / total), len = Math.hypot(n.x - P.x, n.y - P.y);
+    const c1x = P.x + Math.cos(P.a) * len * 0.45, c1y = P.y - Math.sin(P.a) * len * 0.45;
+    const c2x = n.x - Math.cos(n.a) * len * 0.4, c2y = n.y + Math.sin(n.a) * len * 0.4;
+    g += `<path class="br" stroke-width="${f2(w)}" d="M${f2(P.x)} ${f2(P.y)}C${f2(c1x)} ${f2(c1y)} ${f2(c2x)} ${f2(c2y)} ${f2(n.x)} ${f2(n.y)}"/>`;
+  }
+  // trunk: tapered, with a little flare where it meets the ground
+  const wt = 2.6, wb = wt + 2 + anc.length * 0.35, base = ah - 2;
+  g += `<path class="trunk" d="M${f2(cx - wb / 2)} ${base}C${f2(cx - wb / 2)} ${f2(base - trunkH * 0.45)} ${f2(cx - wt / 2)} ${f2(cy + trunkH * 0.3)} ${f2(cx - wt / 2)} ${f2(cy)}L${f2(cx + wt / 2)} ${f2(cy)}C${f2(cx + wt / 2)} ${f2(cy + trunkH * 0.3)} ${f2(cx + wb / 2)} ${f2(base - trunkH * 0.45)} ${f2(cx + wb / 2)} ${base}Z"/>`;
+  g += `<path class="br" stroke-width="${f2(wb * 0.32)}" d="M${f2(cx - wb * 0.3)} ${f2(base - 0.4)}Q${f2(cx - wb * 0.9)} ${f2(base + 0.2)} ${f2(cx - wb * 1.9)} ${f2(base + 1.4)}M${f2(cx + wb * 0.3)} ${f2(base - 0.4)}Q${f2(cx + wb * 0.9)} ${f2(base + 0.2)} ${f2(cx + wb * 1.9)} ${f2(base + 1.4)}"/>`;
+  g += `<path class="ground" d="M${f2(cx - 34)} ${f2(base + 1.4)}H${f2(cx + 34)}"/>`;
+  // ancestors along the trunk, root at the foot, alternating sides
+  const yS = Math.max(1.9, fs * 0.82), fa = Math.max(2.1, fs * 1.08);
+  anc.forEach((q, i) => {
+    const y = base - 5 - i * trunkStep, right = i % 2 === 0, half = (wb - (wb - wt) * (base - y) / (base - cy)) / 2;
+    const x = right ? cx + half + 2.2 : cx - half - 2.2;
+    g += `<path class="ground" d="M${f2(right ? cx + half : cx - half)} ${f2(y)}H${f2(right ? x - 0.6 : x + 0.6)}"/>`;
+    const { nm, yrTxt } = treeLabel(q, fa, 60);
+    g += `<text class="lb in" x="${f2(x)}" y="${f2(y + fa * 0.35)}" font-size="${f2(fa)}" text-anchor="${right ? 'start' : 'end'}">${esc(nm)}${yrTxt ? ` <tspan class="yr" font-size="${f2(yS)}">${yrTxt}</tspan>` : ''}</text>`;
+  });
+  // crown labels along the branch direction; leaves read outward, parents read inward toward the trunk
+  for (const n of nodes) {
+    const q = n.q;
+    if (q === p) continue;
+    const leaf = !q.kids.length, deg = n.a * 180 / Math.PI, right = deg <= 90;
+    const rot = right ? -deg : 180 - deg;
+    const room = leaf ? Lr - 1.5 : Math.max(6, Math.hypot(n.x - n.par.x, n.y - n.par.y) - 2.8);
+    const { nm, yrTxt } = treeLabel(q, fs, room);
+    const outward = leaf === right;                 // which side of the node the text sits on, in the rotated frame
+    const tx = outward ? 1.6 : -1.6, anchor = outward ? 'start' : 'end';
+    if (leaf) g += `<ellipse class="lf" cx="${f2(n.x)}" cy="${f2(n.y)}" rx="1.25" ry=".6" transform="rotate(${f2(-deg)} ${f2(n.x)} ${f2(n.y)})"/>`;
+    else g += `<circle class="kn" cx="${f2(n.x)}" cy="${f2(n.y)}" r=".8"/>`;
+    g += `<text class="lb${leaf ? '' : ' in'}" transform="translate(${f2(n.x)} ${f2(n.y)}) rotate(${f2(rot)})" x="${tx}" y="${f2(fs * 0.34)}" font-size="${f2(fs)}" text-anchor="${anchor}">${esc(nm)}${yrTxt ? ` <tspan class="yr" font-size="${f2(yS)}">${yrTxt}</tspan>` : ''}</text>`;
+  }
+  // the selected person, where trunk and crown meet
+  const meRight = anc.length % 2 === 0, mf = Math.max(3, fs * 1.35);
+  g += `<circle class="kn me" cx="${f2(cx)}" cy="${f2(cy)}" r="1.4"/>`;
+  g += `<text class="lb me" x="${f2(meRight ? cx + 3.4 : cx - 3.4)}" y="${f2(cy + mf * 1.15)}" font-size="${f2(mf)}" text-anchor="${meRight ? 'start' : 'end'}">${esc(plainName(p))}${p.god != null ? ` <tspan class="yr" font-size="${f2(mf * 0.7)}">${p.god}</tspan>` : ''}</text>`;
+  // title block
+  const today = new Date().toLocaleDateString(lang === 'sr' ? 'sr-Latn' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  g += `<text class="pk2" x="0" y="3.4" font-size="2.3">${esc(t('treeDoc').toUpperCase())}</text>`;
+  g += `<text class="pt" x="0" y="11" font-size="6.2">${esc(plainName(p))}${p.god != null ? ` <tspan class="pd" font-size="3.4">${esc(yr(p.god))}</tspan>` : ''}</text>`;
+  g += `<text class="pd" x="0" y="16.2" font-size="2.5">${esc(CFG.title)} · ${esc(t('printCount')(anc.length, p.size - 1))} · ${esc(today)}</text>`;
+  const html = `<section class="sheet" style="width:${pw}mm;height:${ph}mm;padding:${M}mm">
+    <div class="pbody" style="padding:0"><svg class="ptree otree" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${aw} ${ah}" width="${aw}mm" height="${ah}mm">${g}</svg></div>
+    <footer class="pf"><span>${esc(plainName(p))} · ${esc(t('treeDoc').toLowerCase())}</span><span>${esc(t('pageOf')(1, 1))}</span></footer>
+  </section>`;
+  return { pw, ph, html, count: [t('pages')(1), fs < 1.75 ? t('tinyType') : ''].filter(Boolean).join(' · '), poster: false };
+}
+/* The drawn tree. The first ancestor is the foot of the trunk and every later ancestor sits on the trunk up to
+   the selected person, where the crown begins. Each person is a pill with their name written inside, lying along
+   their branch: the branch from the parent enters one end and the children's branches leave the other. Branches
+   follow each other end to end rather than by generation, so a long name makes a longer limb. Each person gets
+   a slice of the fan in proportion to the leaves (people without children) below them, a branch is as thick as
+   the family it carries, and the fan is spread just far enough that neighbouring pills do not touch. The whole
+   drawing is then scaled to fit one sheet, trying a few fan widths and keeping the one with the largest type. */
+function organicLayout(p, o) {
+  const [w0, h0] = PAPER[o.size];
+  const [pw, ph] = o.orient === 'landscape' ? [h0, w0] : [w0, h0];
+  const M = 10, FOOT = 7, TITLE = 20;
+  const aw = pw - 2 * M, ah = ph - 2 * M - FOOT;
+  const anc = [];
+  for (let q = p.par != null ? people.get(p.par) : null; q; q = q.par != null ? people.get(q.par) : null) anc.unshift(q);
+  const leaves = new Map();
+  const count = q => { let n = 0; for (const k of q.kids) n += count(k); leaves.set(q, n || 1); return n || 1; };
+  const total = count(p);
+  // nominal sizes in millimetres; the drawing is scaled as a whole at the end
+  const FS = 2.6, YS = 2.05, PADX = 1.9, TH = FS * 1.7, GAP = 5;
+  const parentOf = q => q.par != null ? people.get(q.par) : null;
+  const nameOf = q => { const par = parentOf(q); return `${q.ime}${q.nad ? ` „${q.nad}”` : ''}${!par || par.prez !== q.prez || q === p || anc.includes(q) ? ' ' + q.prez : ''}`; };
+  const wOf = (txt, font, size) => { measure.font = font(size * PX_MM * 4); return measure.measureText(txt).width / (PX_MM * 4); };
+  const pillOf = (q, fs = FS) => {
+    const nm = nameOf(q), y = q.god != null ? String(q.god) : '';
+    return { nm, y, fs, len: Math.max(wOf(nm, NAME_FONT, fs) + (y ? wOf(' ' + y, DET_FONT, YS * fs / FS) : 0) + 2 * PADX, TH * 1.8) };
+  };
+  const build = q => ({ q, kids: q.kids.map(build), pill: q === p ? null : pillOf(q) });
+  const root = build(p);
+  const all = [];
+  (function list(n) { all.push(n); n.kids.forEach(list); })(root);
+  (function chain(n, base) { n.c = base; for (const k of n.kids) chain(k, n === root ? 0 : base + n.pill.len + GAP); })(root, 0);
+  const mePill = pillOf(p, FS * 1.25), MEH = TH * 1.25;
+  const STEP = TH + 3.2, trunkTop = MEH + 1, trunkH = trunkTop + anc.length * STEP + 7;
+  const fan = (A0, A1) => {
+    (function ang(n, a0, a1) {
+      n.a = (a0 + a1) / 2; n.w = a1 - a0;
+      let at = a0;
+      for (const k of n.kids) { const w = (a1 - a0) * leaves.get(k.q) / leaves.get(n.q); ang(k, at, at + w); at += w; }
+    })(root, A0, A1);
+    let r0 = 16;    // how far the first branches reach before the first pills: far enough for the slices to fit a pill
+    for (const n of all) if (n !== root) r0 = Math.max(r0, TH * 1.18 / Math.min(n.w, 1.2) - n.c);
+    let minX = -mePill.len / 2, maxX = mePill.len / 2, minY = 0;
+    for (const n of all) {
+      if (n === root) continue;
+      const ux = Math.cos(n.a), uy = -Math.sin(n.a), px = -uy * TH / 2, py = ux * TH / 2;
+      n.ri = r0 + n.c; n.ro = n.ri + n.pill.len;
+      for (const r of [n.ri, n.ro]) for (const sg of [-1, 1]) {
+        const x = r * ux + sg * px, y = r * uy + sg * py;
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y);
+      }
+    }
+    minX = Math.min(minX, -40); maxX = Math.max(maxX, 40);     // room for the ground line
+    const W = maxX - minX, H = trunkH - minY;
+    return { A0, A1, r0, minX, maxX, minY, W, H, s: Math.min(aw / W, (ah - TITLE) / H, 1.4) };
+  };
+  const deg = Math.PI / 180;
+  let best = null;
+  for (const [a0, a1] of [[8, 172], [20, 160], [32, 148], [44, 136], [56, 124]]) { const f = fan(a0 * deg, a1 * deg); if (!best || f.s > best.s) best = f; }
+  const F = fan(best.A0, best.A1);              // lay the winner out again so every node carries its geometry
+  const f2 = v => v.toFixed(2);
+  let g = '';
+  // branches, thickest first so the fine twigs sit on top
+  const ends = n => n === root ? { x: 0, y: 0, ux: 0, uy: -1 } : { x: n.ro * Math.cos(n.a), y: -n.ro * Math.sin(n.a), ux: Math.cos(n.a), uy: -Math.sin(n.a) };
+  const edges = [];
+  for (const n of all) for (const k of n.kids) edges.push([n, k]);
+  edges.sort((a, b) => leaves.get(b[1].q) - leaves.get(a[1].q));
+  for (const [n, k] of edges) {
+    const P = ends(n), kx = k.ri * Math.cos(k.a), ky = -k.ri * Math.sin(k.a), ux = Math.cos(k.a), uy = -Math.sin(k.a);
+    const len = Math.hypot(kx - P.x, ky - P.y), w = 0.3 + 2.5 * Math.sqrt(leaves.get(k.q) / total);
+    g += `<path class="br" stroke-width="${f2(w)}" d="M${f2(P.x)} ${f2(P.y)}C${f2(P.x + P.ux * len * 0.45)} ${f2(P.y + P.uy * len * 0.45)} ${f2(kx - ux * len * 0.4)} ${f2(ky - uy * len * 0.4)} ${f2(kx)} ${f2(ky)}"/>`;
+  }
+  // trunk: tapered from the selected person down to the ground, with a little flare at the foot
+  const wt = 2.8, wb = wt + 2.2 + anc.length * 0.4, base = trunkH - 1.5;
+  g += `<path class="trunk" d="M${f2(-wb / 2)} ${f2(base)}C${f2(-wb / 2)} ${f2(base - trunkH * 0.45)} ${f2(-wt / 2)} ${f2(trunkTop + trunkH * 0.25)} ${f2(-wt / 2)} ${f2(trunkTop - MEH / 2)}L${f2(wt / 2)} ${f2(trunkTop - MEH / 2)}C${f2(wt / 2)} ${f2(trunkTop + trunkH * 0.25)} ${f2(wb / 2)} ${f2(base - trunkH * 0.45)} ${f2(wb / 2)} ${f2(base)}Z"/>`;
+  g += `<path class="br" stroke-width="${f2(wb * 0.32)}" d="M${f2(-wb * 0.3)} ${f2(base - 0.4)}Q${f2(-wb * 0.9)} ${f2(base + 0.2)} ${f2(-wb * 1.9)} ${f2(base + 1.4)}M${f2(wb * 0.3)} ${f2(base - 0.4)}Q${f2(wb * 0.9)} ${f2(base + 0.2)} ${f2(wb * 1.9)} ${f2(base + 1.4)}"/>`;
+  g += `<path class="ground" d="M-38 ${f2(base + 1.4)}H38"/>`;
+  const pill = (cx, cy, rot, pl, h, cls) => `<g transform="translate(${f2(cx)} ${f2(cy)})${rot ? ` rotate(${f2(rot)})` : ''}">`
+    + `<rect class="pill${cls}" x="${f2(-pl.len / 2)}" y="${f2(-h / 2)}" width="${f2(pl.len)}" height="${f2(h)}" rx="${f2(h / 2)}"/>`
+    + `<text class="pn2${cls}" x="0" y="${f2(pl.fs * 0.35)}" font-size="${f2(pl.fs)}" text-anchor="middle">${esc(pl.nm)}${pl.y ? ` <tspan class="yr" font-size="${f2(YS * pl.fs / FS)}">${pl.y}</tspan>` : ''}</text></g>`;
+  // ancestors sit on the trunk, the first ancestor lowest
+  anc.forEach((q, i) => { g += pill(0, base - 5.5 - i * STEP, 0, pillOf(q), TH, ' an'); });
+  // the crown: every pill lies along its branch and reads from the trunk outward
+  for (const n of all) {
+    if (n === root) continue;
+    const r = n.ri + n.pill.len / 2, d = n.a / deg;
+    g += pill(r * Math.cos(n.a), -r * Math.sin(n.a), d <= 90 ? -d : 180 - d, n.pill, TH, n.kids.length ? '' : ' lf');
+  }
+  g += pill(0, trunkTop - MEH / 2 - 0.5, 0, mePill, MEH, ' me');
+  // place the scaled tree on the sheet: centred, standing on the bottom edge, below the title
+  const sc = F.s, tx = (aw - F.W * sc) / 2 - F.minX * sc, ty = ah - trunkH * sc;
+  const today = new Date().toLocaleDateString(lang === 'sr' ? 'sr-Latn' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  const head = `<text class="pk2" x="0" y="3.4" font-size="2.3">${esc(t('treeDoc').toUpperCase())}</text>`
+    + `<text class="pt" x="0" y="11" font-size="6.2">${esc(plainName(p))}${p.god != null ? ` <tspan class="pd" font-size="3.4">${esc(yr(p.god))}</tspan>` : ''}</text>`
+    + `<text class="pd" x="0" y="16.2" font-size="2.5">${esc(CFG.title)} · ${esc(t('printCount')(anc.length, p.size - 1))} · ${esc(today)}</text>`;
+  const html = `<section class="sheet" style="width:${pw}mm;height:${ph}mm;padding:${M}mm">
+    <div class="pbody" style="padding:0"><svg class="ptree otree" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${aw} ${ah}" width="${aw}mm" height="${ah}mm">${head}<g transform="translate(${f2(tx)} ${f2(ty)}) scale(${sc.toFixed(4)})">${g}</g></svg></div>
+    <footer class="pf"><span>${esc(plainName(p))} · ${esc(t('treeDoc').toLowerCase())}</span><span>${esc(t('pageOf')(1, 1))}</span></footer>
+  </section>`;
+  return { pw, ph, html, count: [t('pages')(1), FS * sc < 1.75 ? t('tinyType') : ''].filter(Boolean).join(' · '), poster: false };
+}
+// what the dialog previews and prints, whichever layout is chosen
+function buildPrint(p, o) {
+  if (o.layout === 'tree') return o.nodes === 'dot' ? organicDotsLayout(p, o) : organicLayout(p, o);
+  if (o.layout === 'lr') {
+    const L = printLayout(p, o);
+    return { pw: L.pw, ph: L.ph, html: sheetsHtml(L), count: t('pages')(L.pages.length), poster: false };
+  }
+  const L = treeLayout(p, o), poster = L.ncol * L.nrow > 1;
+  const count = [t('pages')(L.tiles.length), poster ? t('tiled')(L.tiles.length, L.nrow, L.ncol) : '', L.scale < 0.55 ? t('tinyType') : ''].filter(Boolean).join(' · ');
+  return { pw: L.pw, ph: L.ph, html: treeSheetsHtml(L), count, poster };
+}
+let pageStyle = null;
+function openPrint(p) {
+  const opt = (v, l, cur) => `<option value="${v}"${v === cur ? ' selected' : ''}>${esc(l)}</option>`;
+  dPrint.innerHTML = `<div class="dlg-in">
+    <div class="dlg-h"><div><div class="eyebrow">${dot(p)}${esc(t('printTitle'))}</div><h2>${fullName(p)}</h2></div>${closeBtn}</div>
+    <p class="dlg-lede" id="pLede"></p>
+    <form class="popts">
+      <label class="fld"><span>${esc(t('layout'))}</span><select name="layout" id="pLayout">${opt('lr', t('layLR'), printOpts.layout)}${opt('down', t('layDown'), printOpts.layout)}${opt('tree', t('layTree'), printOpts.layout)}</select></label>
+      <label class="fld" id="pNodesL"><span>${esc(t('nodes'))}</span><select name="nodes" id="pNodes">${opt('pill', t('nodePill'), printOpts.nodes)}${opt('dot', t('nodeDot'), printOpts.nodes)}</select></label>
+      <label class="fld"><span>${esc(t('paper'))}</span><select name="size" id="pSize">${['A4', 'Letter', 'A3'].map(k => opt(k, k, printOpts.size)).join('')}</select></label>
+      <label class="fld"><span>${esc(t('orient'))}</span><select name="orient" id="pOrient">${opt('landscape', t('landscape'), printOpts.orient)}${opt('portrait', t('portrait'), printOpts.orient)}</select></label>
+      <label class="chk"><input type="checkbox" name="spouses" id="pSpouses"${printOpts.spouses ? ' checked' : ''}>${esc(t('spouses'))}</label>
+      <label class="chk" id="pFitL"><input type="checkbox" name="fit" id="pFit"${printOpts.fit ? ' checked' : ''}>${esc(t('fit'))}</label>
+      <span class="pcount" id="pCount"></span>
+    </form>
+    <div class="pprev" id="pPrev"></div>
+    <p class="hint">${esc(t('printHint'))} <span id="pTileHint">${esc(t('tileHint'))}</span></p>
+    <div class="dlg-f"><button type="button" class="btn" data-close>${esc(t('cancel'))}</button><button type="button" class="btn primary" data-print>${esc(t('print'))}</button></div>
+  </div>`;
+  const form = dPrint.querySelector('form'), prev = document.getElementById('pPrev');
+  let L;
+  const render = () => {
+    L = buildPrint(p, printOpts);
+    prev.innerHTML = L.html;
+    prev.style.setProperty('--z', Math.min(1, (prev.clientWidth - 26) / (L.pw * PX_MM)).toFixed(4));
+    document.getElementById('pCount').textContent = L.count;
+    document.getElementById('pLede').textContent = t({ lr: 'printLede', down: 'ledeDown', tree: 'ledeTree' }[printOpts.layout]);
+    document.getElementById('pFitL').hidden = printOpts.layout !== 'down';
+    form.elements.spouses.closest('label').hidden = printOpts.layout === 'tree';
+    document.getElementById('pNodesL').hidden = printOpts.layout !== 'tree';
+    document.getElementById('pTileHint').hidden = !L.poster;
+  };
+  form.addEventListener('change', () => {
+    printOpts.size = form.elements.size.value; printOpts.orient = form.elements.orient.value; printOpts.spouses = form.elements.spouses.checked;
+    printOpts.layout = form.elements.layout.value; printOpts.fit = form.elements.fit.checked; printOpts.nodes = form.elements.nodes.value;
+    try { localStorage.setItem('stablo.print', JSON.stringify(printOpts)); } catch (e) {}
+    render();
+  });
+  dPrint.querySelector('[data-print]').addEventListener('click', () => {
+    let out = document.getElementById('printOut');
+    if (!out) { out = document.createElement('div'); out.id = 'printOut'; document.body.appendChild(out); }
+    out.innerHTML = L.html;
+    if (!pageStyle) { pageStyle = document.createElement('style'); document.head.appendChild(pageStyle); }
+    pageStyle.textContent = `@page { size: ${L.pw}mm ${L.ph}mm; margin: 0; }`;
+    document.body.classList.add('printing');
+    dPrint.close();
+    setTimeout(() => window.print(), 60);
+  });
+  dPrint.showModal();
+  render();
+}
+window.addEventListener('afterprint', () => {
+  document.body.classList.remove('printing');
+  const out = document.getElementById('printOut'); if (out) out.innerHTML = '';
+});
 
 /* ---------- pointer interaction ---------- */
 const tip = document.getElementById('tip');
