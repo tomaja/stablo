@@ -297,7 +297,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .ptree .pd { font-family: var(--f-body); fill: var(--p-muted); }
 .ptree .pb.gh { fill: none; stroke-dasharray: .8 .6; }
 .ptree .pd.gh { font-style: italic; }
-:root { --p-bark: #5b4535; --p-leaf: #6a7a36; --p-leaf-tint: #eef1e2; }
+:root { --p-bark: #5b4535; --p-leaf: #6a7a36; --p-leaf-tint: #eef1e2; --p-spouse: #8d8379; }
 .otree .br { fill: none; stroke: var(--p-bark); stroke-linecap: round; }
 .otree .trunk { fill: var(--p-bark); }
 .otree .ground { fill: none; stroke: var(--p-bark); stroke-width: .3; stroke-linecap: round; }
@@ -314,6 +314,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .otree .lb.in { font-weight: 600; }
 .otree .lb.me { font-weight: 600; }
 .otree .yr { font-family: var(--f-mono); fill: var(--p-muted); }
+.ptree .sp { font-family: var(--f-body); font-weight: 400; fill: var(--p-spouse); }
 .ptree .tr { fill: none; stroke: var(--p-ink); stroke-width: .7; stroke-linecap: round; }
 .ptree .pt { font-family: var(--f-display); font-weight: 500; fill: var(--p-ink); }
 .ptree .pk2 { font-family: var(--f-mono); fill: var(--p-muted); letter-spacing: .08em; }
@@ -1278,6 +1279,21 @@ const NAME_FONT = s => `500 ${s}px Spectral, Georgia, serif`;
 const DET_FONT = s => `400 ${s}px "Instrument Sans", "Segoe UI", system-ui, sans-serif`;
 const measure = document.createElement('canvas').getContext('2d');
 // shorten text with an ellipsis until it fits maxMm at sizeMm
+/* The spouse field is free text ("I. Mika, 1902, domaćica, r. Pilipović; II. Sava, 1916, domaćica, r. Rodić",
+   "Smiljana r. Pilipović (1855.)"). For drawings keep only the names: no years, notes in brackets, numbering or
+   occupations, keeping "r." (née). Several long names shrink to first names only. */
+function spouseShort(sup) {
+  if (!sup) return '';
+  let c = sup.replace(/\([^)]*\)/g, ' ')
+    .replace(/(^|[\s,;])(I{1,3}|IV|V)\.(?=\s)/g, '$1')
+    .replace(/\b\d{1,4}\.?/g, ' ')
+    .split(/([\s,;]+)/).filter(w => !/^[a-zčćšžđ]/.test(w) || w === 'r.').join('')
+    .replace(/[\s,;]*([,;])[\s,;]*/g, '$1 ')
+    .replace(/,\s*(?=r\.)/g, ' ')
+    .replace(/^[\s,;]+|[\s,;]+$/g, '').replace(/\s+/g, ' ');
+  if (c.length > 26) c = c.split(/[,;]\s*/).map(x => x.split(' ')[0]).filter(Boolean).join(', ');
+  return c;
+}
 function fitText(text, font, sizeMm, maxMm) {
   measure.font = font(sizeMm * PX_MM * 4);
   const w = x => measure.measureText(x).width / (PX_MM * 4);
@@ -1357,7 +1373,7 @@ function sheetSvg(L, a, b) {
     s += `<rect class="pb${it.me ? ' me' : it.anc ? ' an' : ''}" x="${x}" y="${y}" width="${boxW}" height="${h}" rx="${1.1 * fs}"/>`;
     s += `<text class="pn${it.me ? ' me' : ''}" x="${x + pad}" y="${y1}" font-size="${nameS}">${esc(fitText(name, NAME_FONT, nameS, tw))}</text>`;
     if (det) s += `<text class="pd" x="${x + pad}" y="${y1 + detS * 1.3}" font-size="${detS}">${esc(fitText(det, DET_FONT, detS, tw))}</text>`;
-    if (L.o.spouses && q.sup) s += `<text class="pd" x="${x + pad}" y="${y1 + detS * 2.6}" font-size="${detS}">${esc(fitText('∞ ' + q.sup, DET_FONT, detS, tw))}</text>`;
+    if (L.o.spouses && q.sup) s += `<text class="pd sp" x="${x + pad}" y="${y1 + detS * 2.6}" font-size="${detS}">${esc(fitText('∞ ' + spouseShort(q.sup), DET_FONT, detS, tw))}</text>`;
   }
   return s + '</svg>';
 }
@@ -1476,7 +1492,7 @@ function treeLayout(p, o) {
     g += `<text class="pn${b.me ? ' me' : ''}" x="${cx}" y="${y + l1}" font-size="${nameS}" text-anchor="middle">${esc(fitText(first, NAME_FONT, nameS, tw))}</text>`;
     if (showSur && q.prez) g += `<text class="pn" x="${cx}" y="${y + l2}" font-size="${surS}" text-anchor="middle">${esc(fitText(q.prez, NAME_FONT, surS, tw))}</text>`;
     if (det) g += `<text class="pd" x="${cx}" y="${y + l3}" font-size="${detS}" text-anchor="middle">${esc(fitText(det, DET_FONT, detS, tw))}</text>`;
-    if (o.spouses && q.sup) g += `<text class="pd" x="${cx}" y="${y + l4}" font-size="${detS}" text-anchor="middle">${esc(fitText('∞ ' + q.sup, DET_FONT, detS, tw))}</text>`;
+    if (o.spouses && q.sup) g += `<text class="pd sp" x="${cx}" y="${y + l4}" font-size="${detS}" text-anchor="middle">${esc(fitText('∞ ' + spouseShort(q.sup), DET_FONT, detS, tw))}</text>`;
   }
   // title block in the top-left corner
   const today = new Date().toLocaleDateString(lang === 'sr' ? 'sr-Latn' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -1523,15 +1539,16 @@ function organicDotsLayout(p, o) {
   const A0 = 10 * Math.PI / 180, A1 = 170 * Math.PI / 180;     // the crown's fan, measured from the right, 90° = straight up
   const parentOf = q => q.par != null ? people.get(q.par) : null;
   const nameOf = q => { const par = parentOf(q); return `${q.ime}${q.nad ? ` „${q.nad}”` : ''}${!par || par.prez !== q.prez || q === p ? ' ' + q.prez : ''}`; };
-  /* The longest label that fits the room along the branch: name and year, then the name alone, then the
-     first name with the nickname, then the first name. The first name is always written out in full, even
-     where it runs over a branch; the year is the first thing to go. */
+  /* The longest label that fits the room along the branch: name, year and spouse (when spouses are shown),
+     then without the spouse, then without the year, then the first name with the nickname, then the first
+     name. The first name is always written out in full, even where it runs over a branch. */
   const treeLabel = (q, size, room) => {
     const w = (txt, font, sz) => { measure.font = font(sz * PX_MM * 4); return measure.measureText(txt).width / (PX_MM * 4); };
     const year = q.god != null ? String(q.god) : '', yW = year ? w(' ' + year, DET_FONT, Math.max(1.9, size * 0.82)) : 0;
-    const opts = [[nameOf(q), year], [nameOf(q), ''], [`${q.ime}${q.nad ? ` „${q.nad}”` : ''}`, ''], [q.ime, '']];
-    for (const [nm, y] of opts) if (w(nm, NAME_FONT, size) + (y ? yW : 0) <= room) return { nm, yrTxt: y };
-    return { nm: q.ime, yrTxt: '' };
+    const sp = o.spouses ? spouseShort(q.sup) : '', sW = sp ? w(' ∞ ' + sp, DET_FONT, Math.max(1.9, size * 0.82)) : 0;
+    const opts = [[nameOf(q), year, sp], [nameOf(q), '', sp], [nameOf(q), year, ''], [nameOf(q), '', ''], [`${q.ime}${q.nad ? ` „${q.nad}”` : ''}`, '', ''], [q.ime, '', '']];
+    for (const [nm, y, spT] of opts) if (w(nm, NAME_FONT, size) + (y ? yW : 0) + (spT ? sW : 0) <= room) return { nm, yrTxt: y, spTxt: spT };
+    return { nm: q.ime, yrTxt: '', spTxt: '' };
   };
   const all = [];
   (function walk(q) { all.push(q); q.kids.forEach(walk); })(p);
@@ -1540,7 +1557,7 @@ function organicDotsLayout(p, o) {
   let fs = 2.7, Ry = 40, Rx = 40, Lr = 30;
   for (let pass = 0; pass < 3; pass++) {
     measure.font = NAME_FONT(fs * PX_MM * 4);
-    const longest = Math.max(...all.filter(q => !q.kids.length).map(q => measure.measureText(nameOf(q) + ' 0000').width / (PX_MM * 4)), 10);
+    const longest = Math.max(...all.filter(q => !q.kids.length).map(q => measure.measureText(nameOf(q) + ' 0000' + (o.spouses && q.sup ? ' ∞ ' + spouseShort(q.sup) : '')).width / (PX_MM * 4)), 10);
     Lr = Math.min(longest, 34 * fs / 2.7) + 2.5;
     Ry = Math.max(25, ah - TITLE - trunkH - Lr - 3);
     Rx = Math.max(25, Math.min((aw - 2 * Lr) / 2, Ry * 1.7));
@@ -1553,7 +1570,7 @@ function organicDotsLayout(p, o) {
   const nodes = [];
   (function assign(q, a0, a1, d, rPar, par) {
     const a = (a0 + a1) / 2, r = q === p ? 0 : rOf(q, d, rPar);
-    const n = { q, r, d, par, x: cx + Rx * r * Math.cos(a), y: cy - Ry * r * Math.sin(a) };
+    const n = { q, r, d, par, w: a1 - a0, x: cx + Rx * r * Math.cos(a), y: cy - Ry * r * Math.sin(a) };
     n.a = q === p ? Math.PI / 2 : Math.atan2(cy - n.y, n.x - cx);   // the direction the branch points on paper
     nodes.push(n);
     let at = a0;
@@ -1580,8 +1597,8 @@ function organicDotsLayout(p, o) {
     const y = base - 5 - i * trunkStep, right = i % 2 === 0, half = (wb - (wb - wt) * (base - y) / (base - cy)) / 2;
     const x = right ? cx + half + 2.2 : cx - half - 2.2;
     g += `<path class="ground" d="M${f2(right ? cx + half : cx - half)} ${f2(y)}H${f2(right ? x - 0.6 : x + 0.6)}"/>`;
-    const { nm, yrTxt } = treeLabel(q, fa, 60);
-    g += `<text class="lb in" x="${f2(x)}" y="${f2(y + fa * 0.35)}" font-size="${f2(fa)}" text-anchor="${right ? 'start' : 'end'}">${esc(nm)}${yrTxt ? ` <tspan class="yr" font-size="${f2(yS)}">${yrTxt}</tspan>` : ''}</text>`;
+    const { nm, yrTxt, spTxt } = treeLabel(q, fa, 80);
+    g += `<text class="lb in" x="${f2(x)}" y="${f2(y + fa * 0.35)}" font-size="${f2(fa)}" text-anchor="${right ? 'start' : 'end'}">${esc(nm)}${yrTxt ? ` <tspan class="yr" font-size="${f2(yS)}">${yrTxt}</tspan>` : ''}${spTxt ? ` <tspan class="sp" font-size="${f2(yS)}">∞ ${esc(spTxt)}</tspan>` : ''}</text>`;
   });
   // crown labels along the branch direction; leaves read outward, parents read inward toward the trunk
   for (const n of nodes) {
@@ -1589,18 +1606,21 @@ function organicDotsLayout(p, o) {
     if (q === p) continue;
     const leaf = !q.kids.length, deg = n.a * 180 / Math.PI, right = deg <= 90;
     const rot = right ? -deg : 180 - deg;
-    const room = leaf ? Lr - 1.5 : Math.max(6, Math.hypot(n.x - n.par.x, n.y - n.par.y) - 2.8);
-    const { nm, yrTxt } = treeLabel(q, fs, room);
+    // a parent's label runs inward, toward the trunk, where the fan narrows: it may only use the part of the
+    // branch where its slice of the fan is still wide enough for one line of text
+    const narrow = Math.hypot(n.x - cx, n.y - cy) - fs * 1.15 / Math.max(n.w, 1e-3);
+    const room = leaf ? Lr - 1.5 : Math.max(6, Math.min(Math.hypot(n.x - n.par.x, n.y - n.par.y) - 2.8, narrow));
+    const { nm, yrTxt, spTxt } = treeLabel(q, fs, room);
     const outward = leaf === right;                 // which side of the node the text sits on, in the rotated frame
     const tx = outward ? 1.6 : -1.6, anchor = outward ? 'start' : 'end';
     if (leaf) g += `<ellipse class="lf" cx="${f2(n.x)}" cy="${f2(n.y)}" rx="1.25" ry=".6" transform="rotate(${f2(-deg)} ${f2(n.x)} ${f2(n.y)})"/>`;
     else g += `<circle class="kn" cx="${f2(n.x)}" cy="${f2(n.y)}" r=".8"/>`;
-    g += `<text class="lb${leaf ? '' : ' in'}" transform="translate(${f2(n.x)} ${f2(n.y)}) rotate(${f2(rot)})" x="${tx}" y="${f2(fs * 0.34)}" font-size="${f2(fs)}" text-anchor="${anchor}">${esc(nm)}${yrTxt ? ` <tspan class="yr" font-size="${f2(yS)}">${yrTxt}</tspan>` : ''}</text>`;
+    g += `<text class="lb${leaf ? '' : ' in'}" transform="translate(${f2(n.x)} ${f2(n.y)}) rotate(${f2(rot)})" x="${tx}" y="${f2(fs * 0.34)}" font-size="${f2(fs)}" text-anchor="${anchor}">${esc(nm)}${yrTxt ? ` <tspan class="yr" font-size="${f2(yS)}">${yrTxt}</tspan>` : ''}${spTxt ? ` <tspan class="sp" font-size="${f2(yS)}">∞ ${esc(spTxt)}</tspan>` : ''}</text>`;
   }
   // the selected person, where trunk and crown meet
   const meRight = anc.length % 2 === 0, mf = Math.max(3, fs * 1.35);
   g += `<circle class="kn me" cx="${f2(cx)}" cy="${f2(cy)}" r="1.4"/>`;
-  g += `<text class="lb me" x="${f2(meRight ? cx + 3.4 : cx - 3.4)}" y="${f2(cy + mf * 1.15)}" font-size="${f2(mf)}" text-anchor="${meRight ? 'start' : 'end'}">${esc(plainName(p))}${p.god != null ? ` <tspan class="yr" font-size="${f2(mf * 0.7)}">${p.god}</tspan>` : ''}</text>`;
+  g += `<text class="lb me" x="${f2(meRight ? cx + 3.4 : cx - 3.4)}" y="${f2(cy + mf * 1.15)}" font-size="${f2(mf)}" text-anchor="${meRight ? 'start' : 'end'}">${esc(plainName(p))}${p.god != null ? ` <tspan class="yr" font-size="${f2(mf * 0.7)}">${p.god}</tspan>` : ''}${o.spouses && p.sup ? ` <tspan class="sp" font-size="${f2(mf * 0.7)}">∞ ${esc(spouseShort(p.sup))}</tspan>` : ''}</text>`;
   // title block
   const today = new Date().toLocaleDateString(lang === 'sr' ? 'sr-Latn' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   g += `<text class="pk2" x="0" y="3.4" font-size="2.3">${esc(t('treeDoc').toUpperCase())}</text>`;
@@ -1636,7 +1656,8 @@ function organicLayout(p, o) {
   const wOf = (txt, font, size) => { measure.font = font(size * PX_MM * 4); return measure.measureText(txt).width / (PX_MM * 4); };
   const pillOf = (q, fs = FS) => {
     const nm = nameOf(q), y = q.god != null ? String(q.god) : '';
-    return { nm, y, fs, len: Math.max(wOf(nm, NAME_FONT, fs) + (y ? wOf(' ' + y, DET_FONT, YS * fs / FS) : 0) + 2 * PADX, TH * 1.8) };
+    const sp = o.spouses ? spouseShort(q.sup) : '';
+    return { nm, y, sp, fs, len: Math.max(wOf(nm, NAME_FONT, fs) + (y ? wOf(' ' + y, DET_FONT, YS * fs / FS) : 0) + (sp ? wOf(' ∞ ' + sp, DET_FONT, YS * fs / FS) : 0) + 2 * PADX, TH * 1.8) };
   };
   const build = q => ({ q, kids: q.kids.map(build), pill: q === p ? null : pillOf(q) });
   const root = build(p);
@@ -1690,7 +1711,7 @@ function organicLayout(p, o) {
   g += `<path class="ground" d="M-38 ${f2(base + 1.4)}H38"/>`;
   const pill = (cx, cy, rot, pl, h, cls) => `<g transform="translate(${f2(cx)} ${f2(cy)})${rot ? ` rotate(${f2(rot)})` : ''}">`
     + `<rect class="pill${cls}" x="${f2(-pl.len / 2)}" y="${f2(-h / 2)}" width="${f2(pl.len)}" height="${f2(h)}" rx="${f2(h / 2)}"/>`
-    + `<text class="pn2${cls}" x="0" y="${f2(pl.fs * 0.35)}" font-size="${f2(pl.fs)}" text-anchor="middle">${esc(pl.nm)}${pl.y ? ` <tspan class="yr" font-size="${f2(YS * pl.fs / FS)}">${pl.y}</tspan>` : ''}</text></g>`;
+    + `<text class="pn2${cls}" x="0" y="${f2(pl.fs * 0.35)}" font-size="${f2(pl.fs)}" text-anchor="middle">${esc(pl.nm)}${pl.y ? ` <tspan class="yr" font-size="${f2(YS * pl.fs / FS)}">${pl.y}</tspan>` : ''}${pl.sp ? ` <tspan class="sp" font-size="${f2(YS * pl.fs / FS)}">∞ ${esc(pl.sp)}</tspan>` : ''}</text></g>`;
   // ancestors sit on the trunk, the first ancestor lowest
   anc.forEach((q, i) => { g += pill(0, base - 5.5 - i * STEP, 0, pillOf(q), TH, ' an'); });
   // the crown: every pill lies along its branch and reads from the trunk outward
@@ -1751,7 +1772,6 @@ function openPrint(p) {
     document.getElementById('pCount').textContent = L.count;
     document.getElementById('pLede').textContent = t({ lr: 'printLede', down: 'ledeDown', tree: 'ledeTree' }[printOpts.layout]);
     document.getElementById('pFitL').hidden = printOpts.layout !== 'down';
-    form.elements.spouses.closest('label').hidden = printOpts.layout === 'tree';
     document.getElementById('pNodesL').hidden = printOpts.layout !== 'tree';
     document.getElementById('pTileHint').hidden = !L.poster;
   };
