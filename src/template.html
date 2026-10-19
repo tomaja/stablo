@@ -1268,11 +1268,11 @@ const dPrint = document.getElementById('dPrint');
   });
 }
 const PAPER = { A4: [210, 297], Letter: [215.9, 279.4], A3: [297, 420] };
-const printOpts = { size: 'A4', orient: 'landscape', spouses: false, layout: 'lr', fit: false, nodes: 'pill' };
+const printOpts = { size: 'A4', orient: 'landscape', spouses: false, layout: 'tree', fit: false, nodes: 'pill' };  // the pill tree, unless this browser chose something else before
 try { Object.assign(printOpts, JSON.parse(localStorage.getItem('stablo.print') || '{}')); } catch (e) {}
 if (!PAPER[printOpts.size]) printOpts.size = 'A4';
 if (printOpts.layout === 'up') printOpts.layout = 'tree';
-if (!['lr', 'down', 'tree'].includes(printOpts.layout)) printOpts.layout = 'lr';
+if (!['lr', 'down', 'tree'].includes(printOpts.layout)) printOpts.layout = 'tree';
 if (!['pill', 'dot'].includes(printOpts.nodes)) printOpts.nodes = 'pill';
 const PX_MM = 96 / 25.4;
 const NAME_FONT = s => `500 ${s}px Spectral, Georgia, serif`;
