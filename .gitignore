@@ -10,3 +10,6 @@ __pycache__/
 *.pyc
 .wrangler/
 supabase/.temp/
+
+# database backups: real people, never in git
+backups/
