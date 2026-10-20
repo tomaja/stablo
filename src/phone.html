@@ -186,6 +186,13 @@ mark { background: none; color: var(--accent); font-weight: 600; }
 .chg .none { color: var(--faint); font-style: italic; font-weight: 400; text-decoration: none; }
 .sg .note2 { margin: 0; font-size: 14px; padding: 8px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); overflow-wrap: anywhere; }
 .sg .acts { justify-content: flex-end; margin-top: 2px; }
+/* a marriage link: each person's ancestors and children, so namesakes can be told apart */
+.kin { margin: 0; padding: 8px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); display: grid; grid-template-columns: max-content 1fr; gap: 6px 10px; font-size: 13.5px; }
+.kin dt { font: 500 10px/19px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+.kin dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.kin .yr { font: 11.5px var(--f-mono); color: var(--muted); }
+.kin .gt { color: var(--faint); padding: 0 3px; }
+.kin .none { color: var(--faint); font-style: italic; }
 .sg .acts .btn { height: 44px; padding: 0 18px; }
 @media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
 
@@ -270,7 +277,7 @@ const T = {
     founders: 'Začetnici loza', unknown: 'nepoznato', gen: n => `${n}. generacija`, born: 'rođ.',
     spouse: 'Supružnik', source: 'Izvor', note: 'Napomena', viewTree: 'Pogledaj stablo', editAdd: 'Uredi · dodaj dete', pdf: 'Preuzmi pdf',
     siblings: 'Braća i sestre', prev: 'Prethodni', next: 'Sledeći', childKofN: (k, n) => `Dete ${k} od ${n}`, founderKofN: (k, n) => `Začetnik ${k} od ${n}`,
-    swipe: 'prevucite karticu levo ili desno', children: 'Deca', noKids: 'Nema upisane dece.', inTree: 'Brak u stablu', otherFounders: 'Ostali začetnici',
+    swipe: 'prevucite karticu levo ili desno', children: 'Deca', noKids: 'Nema upisane dece.', ancestors: 'Preci', kinNone: 'nema upisane dece', inTree: 'Brak u stablu', otherFounders: 'Ostali začetnici',
     tree: 'Stablo', loadingTree: 'Učitavanje stabla…',
     editorLogin: 'Prijava za urednike', login: 'Prijava urednika', loginLede: 'Samo urednici mogu da odobravaju predloge.',
     email: 'E-pošta', password: 'Lozinka', signIn: 'Prijavi se', signOut: 'Odjavi se', notAdmin: 'Ovaj nalog nema urednička prava.',
@@ -297,7 +304,7 @@ const T = {
     founders: 'Founders of the lines', unknown: 'unknown', gen: n => `Generation ${n}`, born: 'b.',
     spouse: 'Spouse', source: 'Source', note: 'Note', viewTree: 'View tree', editAdd: 'Edit · add child', pdf: 'Download PDF',
     siblings: 'Siblings', prev: 'Previous', next: 'Next', childKofN: (k, n) => `Child ${k} of ${n}`, founderKofN: (k, n) => `Founder ${k} of ${n}`,
-    swipe: 'swipe the card left or right', children: 'Children', noKids: 'No children recorded.', inTree: 'Married into tree', otherFounders: 'Other founders',
+    swipe: 'swipe the card left or right', children: 'Children', noKids: 'No children recorded.', ancestors: 'Ancestors', kinNone: 'no children recorded', inTree: 'Married into tree', otherFounders: 'Other founders',
     tree: 'Tree', loadingTree: 'Loading the tree…',
     editorLogin: 'Editor sign-in', login: 'Editor sign-in', loginLede: 'Only editors can approve suggestions.',
     email: 'E-mail', password: 'Password', signIn: 'Sign in', signOut: 'Sign out', notAdmin: 'This account has no editor rights.',
@@ -324,7 +331,7 @@ const T = {
     founders: 'Fondateurs des lignées', unknown: 'inconnu', gen: n => `${n}${n === 1 ? 're' : 'e'} génération`, born: 'naiss.',
     spouse: 'Conjoint', source: 'Source', note: 'Remarque', viewTree: 'Voir l’arbre', editAdd: 'Modifier · ajouter un enfant', pdf: 'Télécharger le PDF',
     siblings: 'Frères et sœurs', prev: 'Précédent', next: 'Suivant', childKofN: (k, n) => `Enfant ${k} sur ${n}`, founderKofN: (k, n) => `Fondateur ${k} sur ${n}`,
-    swipe: 'glissez la fiche vers la gauche ou la droite', children: 'Enfants', noKids: 'Aucun enfant enregistré.', inTree: 'Mariage dans l’arbre', otherFounders: 'Autres fondateurs',
+    swipe: 'glissez la fiche vers la gauche ou la droite', children: 'Enfants', noKids: 'Aucun enfant enregistré.', ancestors: 'Ancêtres', kinNone: 'aucun enfant enregistré', inTree: 'Mariage dans l’arbre', otherFounders: 'Autres fondateurs',
     tree: 'Arbre', loadingTree: 'Chargement de l’arbre…',
     editorLogin: 'Connexion éditeur', login: 'Connexion éditeur', loginLede: 'Seuls les éditeurs peuvent approuver les propositions.',
     email: 'E-mail', password: 'Mot de passe', signIn: 'Se connecter', signOut: 'Se déconnecter', notAdmin: 'Ce compte n’a pas de droits d’éditeur.',
@@ -351,7 +358,7 @@ const T = {
     founders: 'Begründer der Linien', unknown: 'unbekannt', gen: n => `${n}. Generation`, born: 'geb.',
     spouse: 'Ehepartner', source: 'Quelle', note: 'Anmerkung', viewTree: 'Baum ansehen', editAdd: 'Bearbeiten · Kind hinzufügen', pdf: 'PDF herunterladen',
     siblings: 'Geschwister', prev: 'Vorherige', next: 'Nächste', childKofN: (k, n) => `Kind ${k} von ${n}`, founderKofN: (k, n) => `Begründer ${k} von ${n}`,
-    swipe: 'Karte nach links oder rechts wischen', children: 'Kinder', noKids: 'Keine Kinder eingetragen.', inTree: 'Ehe im Stammbaum', otherFounders: 'Weitere Begründer',
+    swipe: 'Karte nach links oder rechts wischen', children: 'Kinder', noKids: 'Keine Kinder eingetragen.', ancestors: 'Vorfahren', kinNone: 'keine Kinder eingetragen', inTree: 'Ehe im Stammbaum', otherFounders: 'Weitere Begründer',
     tree: 'Baum', loadingTree: 'Baum wird geladen…',
     editorLogin: 'Anmeldung für Redakteure', login: 'Anmeldung für Redakteure', loginLede: 'Nur Redakteure können Vorschläge freigeben.',
     email: 'E-Mail', password: 'Passwort', signIn: 'Anmelden', signOut: 'Abmelden', notAdmin: 'Dieses Konto hat keine Redakteursrechte.',
@@ -663,6 +670,18 @@ $('loginForm').addEventListener('submit', async e => {
   } catch (x) { err.textContent = x.message || String(x); err.hidden = false; }
   finally { btn.disabled = false; }
 });
+// ancestors from the founder down, and the children (same as the main page's spouse dialog)
+function kinHtml(q) {
+  const who = x => `${esc(x.prez && x.prez !== q.prez ? name(x) : x.ime)}${x.god != null ? ` <span class="yr">${esc(String(x.god))}</span>` : ''}`;
+  const anc = []; for (let x = q.par != null ? people.get(q.par) : null; x; x = x.par != null ? people.get(x.par) : null) anc.unshift(x);
+  const rows = [
+    [t('ancestors'), anc.length ? anc.map(who).join('<span class="gt">›</span>') : `<span class="none">${esc(t('lineRoot'))}</span>`],
+    [t('children'), q.kids.length ? q.kids.map(who).join(', ') + (q.size - 1 > q.kids.length ? ` · ${esc(t('descendants'))}: ${fmt(q.size - 1)}` : '')
+      : `<span class="none">${esc(t('kinNone'))}</span>`]
+  ];
+  if (q.sup) rows.push([t('spouse'), esc(q.sup)]);
+  return `<dl class="kin">${rows.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${b}</dd>`).join('')}</dl>`;
+}
 function sgCard(s) {
   const p = people.get(s.person_id), raw = rowById.get(s.person_id) || {}, c = s.changes || {};
   const isNew = s.kind === 'add_child' || s.kind === 'add_root';
@@ -673,7 +692,7 @@ function sgCard(s) {
     const who2 = q => q ? `<a class="ttl" href="#p${q.id}" data-go>${esc(name(q))}</a>` : `<div class="ttl">#${esc(c.brak_id)}</div>`;
     const line = q => q ? esc([q.god != null ? yr(q.god) : '', q.par != null ? `${parentWord(people.get(q.par))}: ${name(people.get(q.par))}` : t('lineRoot')].filter(Boolean).join(' · ')) : '';
     return `<article class="sg" data-id="${s.id}"><div class="eyebrow">${esc(t('linkBadge'))}</div>
-      ${who2(p)}<div class="who">${line(p)}</div><div class="ttl" aria-hidden="true">∞</div>${who2(sp)}<div class="who">${line(sp)}</div>
+      ${who2(p)}<div class="who">${line(p)}</div>${p ? kinHtml(p) : ''}<div class="ttl" aria-hidden="true">∞</div>${who2(sp)}<div class="who">${line(sp)}</div>${sp ? kinHtml(sp) : ''}
       <div class="who">${who}</div>
       <dl class="chg"><div><dt>${esc(t('inTree'))}</dt><dd><span class="old">${now ? esc(name(now)) : `<span class="none">${esc(t('empty'))}</span>`}</span><span class="new">${sp ? esc(name(sp)) : '#' + esc(c.brak_id)}</span></dd></div></dl>
       ${s.comment ? `<p class="note2">${esc(s.comment)}</p>` : ''}

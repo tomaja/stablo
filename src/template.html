@@ -127,6 +127,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .kin .gt { color: var(--faint); padding: 0 3px; }
 .kin .none { color: var(--faint); font-style: italic; }
 .kin-hint { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); }
+.kinbox { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 10px 12px; }
+.kinbox b { font-weight: 600; font-size: 14px; }
+.kinbox small { display: block; font-size: 12.5px; color: var(--muted); }
 .chosen small { display: block; font-weight: 400; color: var(--muted); }
 .linknow { margin: 0; font-size: 13.5px; color: var(--muted); }
 
@@ -1315,7 +1318,7 @@ const personLine = (q, withYear = true) => {
   return [withYear && q.god != null ? yr(q.god) : '', par ? `${parentWord(par)}: ${plainName(par)}` : t('lineRoot'), q.mesto].filter(Boolean).join(' · ');
 };
 // ancestors from the founder down, and the children: enough to tell apart people with the same name
-function kinHtml(q) {
+function kinHtml(q, hint = true) {
   const who = (x, sur) => `${esc(x.prez && x.prez !== sur ? plainName(x) : x.ime)}${x.god != null ? ` <span class="yr">${esc(String(x.god))}</span>` : ''}`;
   const anc = []; for (let x = q.par != null ? people.get(q.par) : null; x; x = x.par != null ? people.get(x.par) : null) anc.unshift(x);
   const rows = [
@@ -1324,7 +1327,7 @@ function kinHtml(q) {
       : `<span class="none">${esc(t('kinNone'))}</span>`]
   ];
   if (q.sup) rows.push([t('spouse'), esc(q.sup)]);
-  return `<dl class="kin">${rows.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${b}</dd>`).join('')}</dl><p class="kin-hint">${esc(t('kinHint'))}</p>`;
+  return `<dl class="kin">${rows.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${b}</dd>`).join('')}</dl>${hint ? `<p class="kin-hint">${esc(t('kinHint'))}</p>` : ''}`;
 }
 function openLink(p) {
   const cur = p.brak != null ? people.get(p.brak) : null;
@@ -1479,9 +1482,8 @@ async function openReview() {
       <div class="sg-h">${btn(p)}<span aria-hidden="true">∞</span>${btn(sp)}<small>${who}</small></div>
       <table class="diff">
         <tr><th>${esc(t('inTree'))}</th><td class="old">${desc(cur)}</td><td class="new">${desc(sp)}</td></tr>
-        ${p ? `<tr><th>${esc(p.ime)}</th><td class="new" colspan="2">${esc(personLine(p))}</td></tr>` : ''}
-        ${sp ? `<tr><th>${esc(sp.ime)}</th><td class="new" colspan="2">${esc(personLine(sp))}</td></tr>` : ''}
       </table>
+      ${[p, sp].filter(Boolean).map(q => `<div class="kinbox"><b>${esc(plainName(q))}</b><small>${esc(personLine(q))}</small>${kinHtml(q, false)}</div>`).join('')}
       ${s.comment ? `<p class="note">${esc(s.comment)}</p>` : ''}
       <p class="msg err" hidden></p>
       <div class="acts"><button type="button" class="btn" data-do="reject">${esc(t('reject'))}</button><button type="button" class="btn primary" data-do="approve">${esc(t('approve'))}</button></div>
