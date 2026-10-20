@@ -116,8 +116,17 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .langmenu button[aria-checked="true"]::after { content: "✓"; margin-left: auto; color: var(--accent); }
 .pick { border: 1px solid var(--line); border-radius: var(--r); background: var(--raise); max-height: 240px; overflow: auto; padding: 4px; }
 .pick:empty { display: none; }
-.chosen { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--accent); border-radius: var(--r); background: var(--accent-soft); }
+.chosen { padding: 10px 12px; border: 1px solid var(--accent); border-radius: var(--r); background: var(--accent-soft); }
+.chosen .ch { display: flex; align-items: center; gap: 10px; }
 .chosen .nm { flex: 1; min-width: 0; font-weight: 500; }
+/* who the chosen person is: their ancestors and children, so namesakes can be told apart */
+.kin { margin: 10px 0 0; padding: 10px 0 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; font-size: 13.5px; }
+.kin dt { font: 500 10.5px/19px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+.kin dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.kin .yr { font: 11.5px var(--f-mono); color: var(--muted); }
+.kin .gt { color: var(--faint); padding: 0 3px; }
+.kin .none { color: var(--faint); font-style: italic; }
+.kin-hint { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); }
 .chosen small { display: block; font-weight: 400; color: var(--muted); }
 .linknow { margin: 0; font-size: 13.5px; color: var(--muted); }
 
@@ -439,6 +448,7 @@ const T = {
     linkLedeAdmin: 'Prijavljeni ste kao urednik: veza se odmah dodaje.',
     linkFind: 'Ime, prezime, mesto ili godina supružnika', linkReplace: 'Novi izbor zamenjuje trenutnu vezu.',
     linkPick: 'Izaberite osobu sa spiska.', linkSame: 'Ova veza već postoji.',
+    kinNone: 'nema upisane dece', kinHint: 'Proverite pretke i decu, jer mnogo osoba ima isto ime i prezime.',
     welcomeTitle: 'Dobro došli u rodoslov', welcomeLede: 'Ovo stablo pravimo zajedno. Evo šta možete da uradite:', gotIt: 'Razumem',
     tipEditT: 'Predložite izmenu', tipEdit: (a, b) => `Kod svake osobe kliknite ${a} da ispravite ili dopunite podatke, ili ${b}. Izmena se pojavljuje kada je urednik odobri.`,
     tipAddT: 'Dodajte osobu', tipAdd: a => `Ako vašeg pretka nema u stablu, a ne znate mu roditelje, kliknite ${a} na početnoj strani. Nova osoba započinje svoju lozu.`,
@@ -502,6 +512,7 @@ const T = {
     linkLedeAdmin: 'You are signed in as an editor: the link is added right away.',
     linkFind: 'Spouse’s name, surname, place or year', linkReplace: 'A new choice replaces the current link.',
     linkPick: 'Pick a person from the list.', linkSame: 'This link already exists.',
+    kinNone: 'no children recorded', kinHint: 'Check the ancestors and children: many people share the same name.',
     welcomeTitle: 'Welcome to the family tree', welcomeLede: 'We build this tree together. Here’s what you can do:', gotIt: 'Got it',
     tipEditT: 'Suggest a change', tipEdit: (a, b) => `On any person, click ${a} to correct or add details, or ${b}. Changes appear once an editor approves them.`,
     tipAddT: 'Add a person', tipAdd: a => `If your ancestor isn’t in the tree and their parents are unknown, click ${a} on the home page. The new person starts a line of their own.`,
@@ -565,6 +576,7 @@ const T = {
     linkLedeAdmin: 'Vous êtes connecté en tant qu’éditeur : le lien est ajouté immédiatement.',
     linkFind: 'Prénom, nom, lieu ou année du conjoint', linkReplace: 'Un nouveau choix remplace le lien actuel.',
     linkPick: 'Choisissez une personne dans la liste.', linkSame: 'Ce lien existe déjà.',
+    kinNone: 'aucun enfant enregistré', kinHint: 'Vérifiez les ancêtres et les enfants : beaucoup de personnes portent le même nom.',
     welcomeTitle: 'Bienvenue dans l’arbre généalogique', welcomeLede: 'Nous construisons cet arbre ensemble. Voici ce que vous pouvez faire :', gotIt: 'Compris',
     tipEditT: 'Proposer une modification', tipEdit: (a, b) => `Sur chaque personne, cliquez sur ${a} pour corriger ou compléter les informations, ou sur ${b}. Les modifications apparaissent une fois approuvées par un éditeur.`,
     tipAddT: 'Ajouter une personne', tipAdd: a => `Si votre ancêtre n’est pas dans l’arbre et que ses parents sont inconnus, cliquez sur ${a} sur la page d’accueil. La nouvelle personne commence sa propre lignée.`,
@@ -628,6 +640,7 @@ const T = {
     linkLedeAdmin: 'Sie sind als Redakteur angemeldet: Die Verknüpfung wird sofort hinzugefügt.',
     linkFind: 'Vorname, Nachname, Ort oder Jahr des Ehepartners', linkReplace: 'Eine neue Auswahl ersetzt die aktuelle Verknüpfung.',
     linkPick: 'Wählen Sie eine Person aus der Liste.', linkSame: 'Diese Verknüpfung gibt es schon.',
+    kinNone: 'keine Kinder eingetragen', kinHint: 'Prüfen Sie Vorfahren und Kinder: Viele Personen haben denselben Namen.',
     welcomeTitle: 'Willkommen im Stammbaum', welcomeLede: 'Wir bauen diesen Stammbaum gemeinsam. Das können Sie tun:', gotIt: 'Verstanden',
     tipEditT: 'Änderung vorschlagen', tipEdit: (a, b) => `Klicken Sie bei jeder Person auf ${a}, um Angaben zu berichtigen oder zu ergänzen, oder auf ${b}. Änderungen erscheinen, sobald ein Redakteur sie freigibt.`,
     tipAddT: 'Person hinzufügen', tipAdd: a => `Wenn Ihr Vorfahre nicht im Stammbaum ist und seine Eltern unbekannt sind, klicken Sie auf der Startseite auf ${a}. Die neue Person beginnt eine eigene Linie.`,
@@ -1301,6 +1314,18 @@ const personLine = (q, withYear = true) => {
   const par = q.par != null ? people.get(q.par) : null;
   return [withYear && q.god != null ? yr(q.god) : '', par ? `${parentWord(par)}: ${plainName(par)}` : t('lineRoot'), q.mesto].filter(Boolean).join(' · ');
 };
+// ancestors from the founder down, and the children: enough to tell apart people with the same name
+function kinHtml(q) {
+  const who = (x, sur) => `${esc(x.prez && x.prez !== sur ? plainName(x) : x.ime)}${x.god != null ? ` <span class="yr">${esc(String(x.god))}</span>` : ''}`;
+  const anc = []; for (let x = q.par != null ? people.get(q.par) : null; x; x = x.par != null ? people.get(x.par) : null) anc.unshift(x);
+  const rows = [
+    [t('ancestors'), anc.length ? anc.map(x => who(x, q.prez)).join('<span class="gt">›</span>') : `<span class="none">${esc(t('lineRoot'))}</span>`],
+    [t('children'), q.kids.length ? q.kids.map(x => who(x, q.prez)).join(', ') + (q.size - 1 > q.kids.length ? ` · ${esc(t('descendants'))}: ${fmt(q.size - 1)}` : '')
+      : `<span class="none">${esc(t('kinNone'))}</span>`]
+  ];
+  if (q.sup) rows.push([t('spouse'), esc(q.sup)]);
+  return `<dl class="kin">${rows.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${b}</dd>`).join('')}</dl><p class="kin-hint">${esc(t('kinHint'))}</p>`;
+}
 function openLink(p) {
   const cur = p.brak != null ? people.get(p.brak) : null;
   dEdit.innerHTML = `<form class="dlg-in" novalidate>
@@ -1330,7 +1355,7 @@ function openLink(p) {
   };
   const show = () => {
     chosenEl.hidden = !chosen; pick.hidden = !!chosen; find.closest('.fgrid').hidden = !!chosen;
-    if (chosen) chosenEl.innerHTML = `${dot(chosen)}<span class="nm">${esc(plainName(chosen))}<small>${esc(personLine(chosen))}</small></span><button type="button" class="btn" data-change>${esc(t('change'))}</button>`;
+    if (chosen) chosenEl.innerHTML = `<div class="ch">${dot(chosen)}<span class="nm">${esc(plainName(chosen))}<small>${esc(personLine(chosen))}</small></span><button type="button" class="btn" data-change>${esc(t('change'))}</button></div>${kinHtml(chosen)}`;
   };
   find.addEventListener('input', list);
   find.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (found.length === 1) { chosen = found[0]; show(); } } });
