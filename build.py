@@ -20,7 +20,7 @@ from pathlib import Path
 import openpyxl
 
 ROOT = Path(__file__).resolve().parent
-TITLE = "Rodoslov porodica iz Malog i Velikog Cvijetnića"
+TITLE = "Rodoslov porodica iz Malog i Velikog Cvjetnića"
 SHORT = "Rodoslov"
 # ids whose whole subtree (the person and all descendants) is left out of the site
 EXCLUDE_SUBTREES = [87]  # Luka Tuvić
