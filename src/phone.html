@@ -159,7 +159,6 @@ mark { background: none; color: var(--accent); font-weight: 600; }
 :root[data-dir="back"]::view-transition-new(page) { animation-name: in-l; }
 #page { view-transition-name: page; }
 /* editors: sign-in and the review queue */
-.bar.admin { grid-template-columns: repeat(4, 1fr); }
 .bar .ic { position: relative; display: inline-flex; }
 .badge { position: absolute; top: -5px; left: 15px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
   background: var(--accent); color: var(--on-accent); font: 600 11px/18px var(--f-body); text-align: center; }
@@ -203,34 +202,49 @@ mark { background: none; color: var(--accent); font-weight: 600; }
 .welcome p { margin: 3px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
 .welcome .tag { display: inline-block; font-weight: 600; font-size: 13px; color: var(--ink); white-space: nowrap; border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; background: var(--raise); }
 .welcome .ok { width: 100%; height: 48px; margin-top: 18px; justify-content: center; font-size: 15px; }
+
+/* language: the last item in the bottom bar opens a menu above it */
+.bar { grid-template-columns: repeat(4, 1fr); }
+.bar.admin { grid-template-columns: repeat(5, 1fr); }
+.bar .lc { height: 22px; display: grid; place-items: center; font: 600 14px/1 var(--f-mono); letter-spacing: .04em; color: var(--ink); }
+.langmenu { position: absolute; right: 8px; bottom: calc(100% + 8px); min-width: 188px; padding: 4px; display: grid;
+  background: var(--raise); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 18px 40px -18px rgba(0,0,0,.4); }
+.langmenu button { display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 12px; height: 46px; padding: 0 12px; border-radius: 9px; font-size: 15px; color: var(--ink); }
+.langmenu button b { font: 500 12px/1 var(--f-mono); letter-spacing: .06em; color: var(--muted); width: 22px; }
+.langmenu button:active, .langmenu button:focus-visible { background: var(--accent-soft); outline: none; }
+.langmenu button[aria-checked="true"] { font-weight: 600; }
+.langmenu button[aria-checked="true"]::after { content: "✓"; margin-left: auto; color: var(--accent); }
 </style>
 </head>
 <body>
-<div class="page" id="page"><p class="loading">Učitavanje rodoslova…</p></div>
-<nav class="bar" aria-label="Navigacija">
-  <a href="#" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>Početak</a>
+<!-- texts marked data-t are filled from T in the chosen language; the Serbian here shows until the script runs -->
+<div class="page" id="page"><p class="loading" data-t="loading">Učitavanje rodoslova…</p></div>
+<nav class="bar" aria-label="Navigacija" data-t-aria="nav">
+  <a href="#" id="bHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span data-t="home">Početak</span></a>
   <a href="#" id="bUp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span id="lUp">Roditelj</span></a>
-  <button type="button" id="bSearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>Traži</button>
-  <button type="button" id="bRev" hidden><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 13l2.5-7.5h11L20 13v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20"/></svg><span class="badge" id="nRev" hidden></span></span>Predlozi</button>
+  <button type="button" id="bSearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg><span data-t="search">Traži</span></button>
+  <button type="button" id="bRev" hidden><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 13l2.5-7.5h11L20 13v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20"/></svg><span class="badge" id="nRev" hidden></span></span><span data-t="review">Predlozi</span></button>
+  <button type="button" id="bLang" aria-haspopup="menu" aria-expanded="false" aria-controls="langMenu"><span class="lc" id="lLangCode">SR</span><span data-t="lang">Jezik</span></button>
+  <div class="langmenu" id="langMenu" role="menu" hidden></div>
 </nav>
 <div class="sheet" id="sheet" hidden>
-  <div class="sheet-h"><input id="q" type="search" placeholder="Ime, prezime, mesto ili godina" autocomplete="off" spellcheck="false" aria-label="Traži"><button type="button" id="qClose">Zatvori</button></div>
+  <div class="sheet-h"><input id="q" type="search" placeholder="Ime, prezime, mesto ili godina" data-t-ph="searchPh" autocomplete="off" spellcheck="false" aria-label="Traži" data-t-aria="search"><button type="button" id="qClose" data-t="close">Zatvori</button></div>
   <div class="sheet-b" id="qRes"></div>
 </div>
 <div class="sheet" id="loginSheet" hidden>
-  <div class="sheet-h"><h2>Prijava urednika</h2><button type="button" data-close-sheet>Zatvori</button></div>
+  <div class="sheet-h"><h2 data-t="login">Prijava urednika</h2><button type="button" data-close-sheet data-t="close">Zatvori</button></div>
   <div class="sheet-b">
     <form class="form" id="loginForm">
-      <p class="msg">Samo urednici mogu da odobravaju predloge.</p>
-      <label>E-pošta<input name="email" type="email" autocomplete="username" required></label>
-      <label>Lozinka<input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="msg" data-t="loginLede">Samo urednici mogu da odobravaju predloge.</p>
+      <label><span data-t="email">E-pošta</span><input name="email" type="email" autocomplete="username" required></label>
+      <label><span data-t="password">Lozinka</span><input name="password" type="password" autocomplete="current-password" required></label>
       <p class="msg err" id="loginErr" role="alert" hidden></p>
-      <div class="acts"><button type="submit" class="btn primary">Prijavi se</button></div>
+      <div class="acts"><button type="submit" class="btn primary" data-t="signIn">Prijavi se</button></div>
     </form>
   </div>
 </div>
 <div class="sheet" id="revSheet" hidden>
-  <div class="sheet-h"><h2>Predlozi izmena</h2><button type="button" data-close-sheet>Zatvori</button></div>
+  <div class="sheet-h"><h2 data-t="reviewTitle">Predlozi izmena</h2><button type="button" data-close-sheet data-t="close">Zatvori</button></div>
   <div class="sheet-b" id="revBody"></div>
 </div>
 
@@ -242,7 +256,162 @@ const CFG = __CONFIG__;
 const sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+/* ---------- languages: the page's own words only; names, places and other data from the database stay as written ---------- */
+const T = {
+  sr: {
+    loading: 'Učitavanje rodoslova…', loadError: 'Rodoslov trenutno ne može da se učita.', nav: 'Navigacija', lang: 'Jezik',
+    home: 'Početak', up: 'Gore', parentUp: 'Roditelj', fatherUp: 'Otac', motherUp: 'Majka', search: 'Traži', close: 'Zatvori',
+    searchPh: 'Ime, prezime, mesto ili godina', searchHint: 'Upišite ime, prezime, mesto ili godinu rođenja.', noResults: 'Nema rezultata.',
+    results: n => `${n} ${n === 1 ? 'rezultat' : 'rezultata'}`, father: 'otac', mother: 'majka', lineRoot: 'začetnik loze',
+    family: 'Porodica', homeLede: 'Izaberite porodicu, pa idite niz loze dodirom na decu. Preci su uvek u traci na vrhu.',
+    people: 'osoba', lines: 'loza', earliest: 'najstariji zapis', wholeTree: 'Celo stablo', addPerson: 'Dodaj osobu', families: 'Porodice',
+    nLines: n => `${n} loza`, founderOf: s => `začetnik: ${s}`, descendants: 'potomaka', famSub: (n, l) => `${fmt(n)} osoba · ${l} loza`,
+    founders: 'Začetnici loza', unknown: 'nepoznato', gen: n => `${n}. generacija`, born: 'rođ.',
+    spouse: 'Supružnik', source: 'Izvor', note: 'Napomena', viewTree: 'Pogledaj stablo', editAdd: 'Uredi · dodaj dete', pdf: 'Preuzmi pdf',
+    siblings: 'Braća i sestre', prev: 'Prethodni', next: 'Sledeći', childKofN: (k, n) => `Dete ${k} od ${n}`, founderKofN: (k, n) => `Začetnik ${k} od ${n}`,
+    swipe: 'prevucite karticu levo ili desno', children: 'Deca', noKids: 'Nema upisane dece.', inTree: 'Brak u stablu', otherFounders: 'Ostali začetnici',
+    tree: 'Stablo', loadingTree: 'Učitavanje stabla…',
+    editorLogin: 'Prijava za urednike', login: 'Prijava urednika', loginLede: 'Samo urednici mogu da odobravaju predloge.',
+    email: 'E-pošta', password: 'Lozinka', signIn: 'Prijavi se', signOut: 'Odjavi se', notAdmin: 'Ovaj nalog nema urednička prava.',
+    review: 'Predlozi', reviewTitle: 'Predlozi izmena', loadingSugg: 'Učitavanje predloga…', suggError: 'Predlozi trenutno ne mogu da se učitaju: ',
+    reviewLede: n => `${n} na čekanju. Odobreni predlog se odmah primenjuje; odbijeni ostaje zabeležen.`, nothingPending: 'Nema predloga na čekanju.',
+    approve: 'Odobri', reject: 'Odbij', failed: 'Nije uspelo: ', anon: 'anonimno', empty: 'prazno', sexM: 'muški', sexF: 'ženski',
+    linkBadge: 'Povezivanje braka', rootBadge: 'Nova osoba bez roditelja', joinsFamily: s => `ide u porodicu ${s}`, newFamily: 'novo prezime u stablu',
+    childOf: 'Novo dete osobe', change: 'Izmena',
+    fields: { ime: 'Ime', nadimak: 'Nadimak', prezime: 'Prezime', rodjen: 'Godina rođenja', pol: 'Pol', opis: 'Zanimanje',
+      mesto: 'Mesto', supruznik: 'Supružnik', izvor: 'Izvor', napomena: 'Napomena' },
+    welcomeTitle: 'Dobro došli u rodoslov', welcomeLede: 'Ovo stablo pravimo zajedno. Evo šta možete da uradite:', gotIt: 'Razumem',
+    tipEditT: 'Predložite izmenu', tipEdit: a => `Kod svake osobe dodirnite ${a} da ispravite ili dopunite podatke, ili dodate dete. Izmena se pojavljuje kada je urednik odobri.`,
+    tipAddT: 'Dodajte osobu', tipAdd: a => `Ako vašeg pretka nema u stablu, a ne znate mu roditelje, dodirnite ${a} na početnoj strani. Nova osoba započinje svoju lozu.`,
+    tipPdfT: 'Preuzmite svoju lozu', tipPdf: a => `Otvorite osobu i dodirnite ${a}: dobijate njene pretke i potomke kao PDF, spreman za štampu.`
+  },
+  en: {
+    loading: 'Loading the family tree…', loadError: 'The family tree cannot be loaded right now.', nav: 'Navigation', lang: 'Language',
+    home: 'Home', up: 'Up', parentUp: 'Parent', fatherUp: 'Father', motherUp: 'Mother', search: 'Search', close: 'Close',
+    searchPh: 'Name, surname, place or year', searchHint: 'Type a first name, surname, place or year of birth.', noResults: 'No results.',
+    results: n => `${n} ${n === 1 ? 'result' : 'results'}`, father: 'father', mother: 'mother', lineRoot: 'founder of the line',
+    family: 'Family', homeLede: 'Pick a family, then go down the lines by tapping the children. The ancestors are always in the strip at the top.',
+    people: 'people', lines: 'lineages', earliest: 'earliest record', wholeTree: 'Whole tree', addPerson: 'Add person', families: 'Families',
+    nLines: n => `${n} lineages`, founderOf: s => `founder: ${s}`, descendants: 'descendants', famSub: (n, l) => `${fmt(n)} people · ${l} lineages`,
+    founders: 'Founders of the lines', unknown: 'unknown', gen: n => `Generation ${n}`, born: 'b.',
+    spouse: 'Spouse', source: 'Source', note: 'Note', viewTree: 'View tree', editAdd: 'Edit · add child', pdf: 'Download PDF',
+    siblings: 'Siblings', prev: 'Previous', next: 'Next', childKofN: (k, n) => `Child ${k} of ${n}`, founderKofN: (k, n) => `Founder ${k} of ${n}`,
+    swipe: 'swipe the card left or right', children: 'Children', noKids: 'No children recorded.', inTree: 'Married into tree', otherFounders: 'Other founders',
+    tree: 'Tree', loadingTree: 'Loading the tree…',
+    editorLogin: 'Editor sign-in', login: 'Editor sign-in', loginLede: 'Only editors can approve suggestions.',
+    email: 'E-mail', password: 'Password', signIn: 'Sign in', signOut: 'Sign out', notAdmin: 'This account has no editor rights.',
+    review: 'Suggestions', reviewTitle: 'Suggested changes', loadingSugg: 'Loading suggestions…', suggError: 'Suggestions cannot be loaded right now: ',
+    reviewLede: n => `${n} waiting. An approved suggestion applies right away; a rejected one stays on record.`, nothingPending: 'No suggestions are waiting.',
+    approve: 'Approve', reject: 'Reject', failed: 'Failed: ', anon: 'anonymous', empty: 'empty', sexM: 'male', sexF: 'female',
+    linkBadge: 'Marriage link', rootBadge: 'New person without parents', joinsFamily: s => `joins the ${s} family`, newFamily: 'new surname in the tree',
+    childOf: 'New child of', change: 'Change',
+    fields: { ime: 'First name', nadimak: 'Nickname', prezime: 'Surname', rodjen: 'Year of birth', pol: 'Sex', opis: 'Occupation',
+      mesto: 'Place', supruznik: 'Spouse', izvor: 'Source', napomena: 'Note' },
+    welcomeTitle: 'Welcome to the family tree', welcomeLede: 'We build this tree together. Here’s what you can do:', gotIt: 'Got it',
+    tipEditT: 'Suggest a change', tipEdit: a => `On any person, tap ${a} to correct or add details, or to add a child. Changes appear once an editor approves them.`,
+    tipAddT: 'Add a person', tipAdd: a => `If your ancestor isn’t in the tree and their parents are unknown, tap ${a} on the home page. The new person starts a line of their own.`,
+    tipPdfT: 'Download your lineage', tipPdf: a => `Open a person and tap ${a} to get their ancestors and descendants as a PDF, ready to print.`
+  },
+  fr: {
+    loading: 'Chargement de l’arbre…', loadError: 'L’arbre ne peut pas être chargé pour le moment.', nav: 'Navigation', lang: 'Langue',
+    home: 'Accueil', up: 'Haut', parentUp: 'Parent', fatherUp: 'Père', motherUp: 'Mère', search: 'Recherche', close: 'Fermer',
+    searchPh: 'Prénom, nom, lieu ou année', searchHint: 'Saisissez un prénom, un nom, un lieu ou une année de naissance.', noResults: 'Aucun résultat.',
+    results: n => `${n} résultat${n === 1 ? '' : 's'}`, father: 'père', mother: 'mère', lineRoot: 'fondateur de la lignée',
+    family: 'Famille', homeLede: 'Choisissez une famille, puis descendez les lignées en touchant les enfants. Les ancêtres restent dans la bande du haut.',
+    people: 'personnes', lines: 'lignées', earliest: 'plus ancienne mention', wholeTree: 'Arbre entier', addPerson: 'Ajouter une personne', families: 'Familles',
+    nLines: n => `${n} lignées`, founderOf: s => `fondateur : ${s}`, descendants: 'descendants', famSub: (n, l) => `${fmt(n)} personnes · ${l} lignées`,
+    founders: 'Fondateurs des lignées', unknown: 'inconnu', gen: n => `${n}${n === 1 ? 're' : 'e'} génération`, born: 'naiss.',
+    spouse: 'Conjoint', source: 'Source', note: 'Remarque', viewTree: 'Voir l’arbre', editAdd: 'Modifier · ajouter un enfant', pdf: 'Télécharger le PDF',
+    siblings: 'Frères et sœurs', prev: 'Précédent', next: 'Suivant', childKofN: (k, n) => `Enfant ${k} sur ${n}`, founderKofN: (k, n) => `Fondateur ${k} sur ${n}`,
+    swipe: 'glissez la fiche vers la gauche ou la droite', children: 'Enfants', noKids: 'Aucun enfant enregistré.', inTree: 'Mariage dans l’arbre', otherFounders: 'Autres fondateurs',
+    tree: 'Arbre', loadingTree: 'Chargement de l’arbre…',
+    editorLogin: 'Connexion éditeur', login: 'Connexion éditeur', loginLede: 'Seuls les éditeurs peuvent approuver les propositions.',
+    email: 'E-mail', password: 'Mot de passe', signIn: 'Se connecter', signOut: 'Se déconnecter', notAdmin: 'Ce compte n’a pas de droits d’éditeur.',
+    review: 'Propositions', reviewTitle: 'Modifications proposées', loadingSugg: 'Chargement des propositions…', suggError: 'Les propositions ne peuvent pas être chargées pour le moment : ',
+    reviewLede: n => `${n} en attente. Une proposition approuvée s’applique immédiatement ; une proposition refusée reste enregistrée.`, nothingPending: 'Aucune proposition en attente.',
+    approve: 'Approuver', reject: 'Refuser', failed: 'Échec : ', anon: 'anonyme', empty: 'vide', sexM: 'masculin', sexF: 'féminin',
+    linkBadge: 'Lien de mariage', rootBadge: 'Nouvelle personne sans parents', joinsFamily: s => `rejoint la famille ${s}`, newFamily: 'nouveau nom dans l’arbre',
+    childOf: 'Nouvel enfant de', change: 'Modification',
+    fields: { ime: 'Prénom', nadimak: 'Surnom', prezime: 'Nom', rodjen: 'Année de naissance', pol: 'Sexe', opis: 'Profession',
+      mesto: 'Lieu', supruznik: 'Conjoint', izvor: 'Source', napomena: 'Remarque' },
+    welcomeTitle: 'Bienvenue dans l’arbre généalogique', welcomeLede: 'Nous construisons cet arbre ensemble. Voici ce que vous pouvez faire :', gotIt: 'Compris',
+    tipEditT: 'Proposer une modification', tipEdit: a => `Sur chaque personne, touchez ${a} pour corriger ou compléter les informations, ou ajouter un enfant. Les modifications apparaissent une fois approuvées par un éditeur.`,
+    tipAddT: 'Ajouter une personne', tipAdd: a => `Si votre ancêtre n’est pas dans l’arbre et que ses parents sont inconnus, touchez ${a} sur la page d’accueil. La nouvelle personne commence sa propre lignée.`,
+    tipPdfT: 'Télécharger votre lignée', tipPdf: a => `Ouvrez une personne et touchez ${a} : vous obtenez ses ancêtres et ses descendants en PDF, prêt à imprimer.`
+  },
+  de: {
+    loading: 'Stammbaum wird geladen…', loadError: 'Der Stammbaum kann gerade nicht geladen werden.', nav: 'Navigation', lang: 'Sprache',
+    home: 'Start', up: 'Hoch', parentUp: 'Elternteil', fatherUp: 'Vater', motherUp: 'Mutter', search: 'Suche', close: 'Schließen',
+    searchPh: 'Vorname, Nachname, Ort oder Jahr', searchHint: 'Geben Sie einen Vornamen, Nachnamen, Ort oder ein Geburtsjahr ein.', noResults: 'Keine Treffer.',
+    results: n => `${n} Treffer`, father: 'Vater', mother: 'Mutter', lineRoot: 'Begründer der Linie',
+    family: 'Familie', homeLede: 'Wählen Sie eine Familie und gehen Sie dann die Linien hinunter, indem Sie auf die Kinder tippen. Die Vorfahren stehen immer in der Leiste oben.',
+    people: 'Personen', lines: 'Linien', earliest: 'ältester Eintrag', wholeTree: 'Ganzer Baum', addPerson: 'Person hinzufügen', families: 'Familien',
+    nLines: n => `${n} Linien`, founderOf: s => `Begründer: ${s}`, descendants: 'Nachkommen', famSub: (n, l) => `${fmt(n)} Personen · ${l} Linien`,
+    founders: 'Begründer der Linien', unknown: 'unbekannt', gen: n => `${n}. Generation`, born: 'geb.',
+    spouse: 'Ehepartner', source: 'Quelle', note: 'Anmerkung', viewTree: 'Baum ansehen', editAdd: 'Bearbeiten · Kind hinzufügen', pdf: 'PDF herunterladen',
+    siblings: 'Geschwister', prev: 'Vorherige', next: 'Nächste', childKofN: (k, n) => `Kind ${k} von ${n}`, founderKofN: (k, n) => `Begründer ${k} von ${n}`,
+    swipe: 'Karte nach links oder rechts wischen', children: 'Kinder', noKids: 'Keine Kinder eingetragen.', inTree: 'Ehe im Stammbaum', otherFounders: 'Weitere Begründer',
+    tree: 'Baum', loadingTree: 'Baum wird geladen…',
+    editorLogin: 'Anmeldung für Redakteure', login: 'Anmeldung für Redakteure', loginLede: 'Nur Redakteure können Vorschläge freigeben.',
+    email: 'E-Mail', password: 'Passwort', signIn: 'Anmelden', signOut: 'Abmelden', notAdmin: 'Dieses Konto hat keine Redakteursrechte.',
+    review: 'Vorschläge', reviewTitle: 'Vorgeschlagene Änderungen', loadingSugg: 'Vorschläge werden geladen…', suggError: 'Die Vorschläge können gerade nicht geladen werden: ',
+    reviewLede: n => `${n} offen. Ein freigegebener Vorschlag gilt sofort; ein abgelehnter bleibt gespeichert.`, nothingPending: 'Keine Vorschläge offen.',
+    approve: 'Freigeben', reject: 'Ablehnen', failed: 'Fehlgeschlagen: ', anon: 'anonym', empty: 'leer', sexM: 'männlich', sexF: 'weiblich',
+    linkBadge: 'Ehe-Verknüpfung', rootBadge: 'Neue Person ohne Eltern', joinsFamily: s => `kommt zur Familie ${s}`, newFamily: 'neuer Nachname im Stammbaum',
+    childOf: 'Neues Kind von', change: 'Änderung',
+    fields: { ime: 'Vorname', nadimak: 'Spitzname', prezime: 'Nachname', rodjen: 'Geburtsjahr', pol: 'Geschlecht', opis: 'Beruf',
+      mesto: 'Ort', supruznik: 'Ehepartner', izvor: 'Quelle', napomena: 'Anmerkung' },
+    welcomeTitle: 'Willkommen im Stammbaum', welcomeLede: 'Wir bauen diesen Stammbaum gemeinsam. Das können Sie tun:', gotIt: 'Verstanden',
+    tipEditT: 'Änderung vorschlagen', tipEdit: a => `Tippen Sie bei jeder Person auf ${a}, um Angaben zu berichtigen oder zu ergänzen oder ein Kind hinzuzufügen. Änderungen erscheinen, sobald ein Redakteur sie freigibt.`,
+    tipAddT: 'Person hinzufügen', tipAdd: a => `Wenn Ihr Vorfahre nicht im Stammbaum ist und seine Eltern unbekannt sind, tippen Sie auf der Startseite auf ${a}. Die neue Person beginnt eine eigene Linie.`,
+    tipPdfT: 'Ihre Linie herunterladen', tipPdf: a => `Öffnen Sie eine Person und tippen Sie auf ${a}: Sie erhalten ihre Vorfahren und Nachkommen als druckfertiges PDF.`
+  }
+};
+// the same choice and storage key as the main page, so both pages stay in one language
+const LANGS = { sr: 'Srpski', en: 'English', fr: 'Français', de: 'Deutsch' };
+const LOCALE = { sr: 'sr-Latn', en: 'en-GB', fr: 'fr-FR', de: 'de-DE' };
+let lang;
+{
+  let stored = null;
+  try { stored = localStorage.getItem('stablo.lang'); } catch (e) {}
+  const fromBrowser = ((navigator.languages && navigator.languages[0]) || navigator.language || '').slice(0, 2).toLowerCase();
+  lang = stored && T[stored] ? stored : (fromBrowser === 'fr' || fromBrowser === 'de') ? fromBrowser : 'sr';
+}
+const t = k => T[lang][k];
+const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, { sr: '.', de: '.', fr: ' ', en: ',' }[lang]);
+// the fixed parts of the page: bar, sheets, the language menu
+function renderChrome() {
+  document.documentElement.lang = { sr: 'sr-Latn', en: 'en', fr: 'fr', de: 'de' }[lang];
+  document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
+  document.querySelectorAll('[data-t-ph]').forEach(el => { el.placeholder = t(el.dataset.tPh); });
+  document.querySelectorAll('[data-t-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.tAria)); });
+  $('lLangCode').textContent = lang.toUpperCase();
+  $('bLang').setAttribute('aria-label', `${t('lang')}: ${LANGS[lang]}`);
+  $('langMenu').innerHTML = Object.entries(LANGS).map(([k, v]) =>
+    `<button type="button" role="menuitemradio" aria-checked="${k === lang}" data-lang="${k}" lang="${k}"><b>${k.toUpperCase()}</b>${esc(v)}</button>`).join('');
+}
+renderChrome();
+const langOpen = open => {
+  $('langMenu').hidden = !open; $('bLang').setAttribute('aria-expanded', String(open));
+  if (open) ($('langMenu').querySelector('[aria-checked="true"]') || $('langMenu').firstElementChild).focus();
+};
+$('bLang').onclick = () => langOpen($('langMenu').hidden);
+$('langMenu').addEventListener('keydown', e => {
+  const items = [...$('langMenu').querySelectorAll('[data-lang]')], k = items.indexOf(document.activeElement);
+  if (e.key === 'Escape') { e.preventDefault(); langOpen(false); $('bLang').focus(); }
+  else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); items[(k + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length].focus(); }
+});
+document.addEventListener('pointerdown', e => { if (!$('langMenu').hidden && !e.target.closest('#langMenu, #bLang')) langOpen(false); });
+let onLang = () => {};   // set once the data is in: redraws whatever is showing
+$('langMenu').addEventListener('click', e => {
+  const b = e.target.closest('[data-lang]'); if (!b) return;
+  langOpen(false); $('bLang').focus();
+  if (b.dataset.lang === lang) return;
+  lang = b.dataset.lang;
+  try { localStorage.setItem('stablo.lang', lang); } catch (e) {}
+  renderChrome(); onLang();
+});
 // a small tree (trunk, branches, leaves) for Preuzmi pdf
 const printIcon = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 14.6V8.4M8 8.4 4.6 5.4M8 8.4l3.4-3M8 8.4V4.2M8 11 5.2 9.4M6.4 14.6h3.2"/><circle cx="4" cy="4.8" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="4.8" r="1.3" fill="currentColor" stroke="none"/><circle cx="8" cy="3" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.6" cy="9" r="1.1" fill="currentColor" stroke="none"/></svg>';
 const treeIcon = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="8" r="1.6" fill="currentColor"/><path d="M8 6.4V2M6.6 9 3.5 11.5M9.4 9l3.1 2.5"/></svg>';
@@ -263,7 +432,7 @@ async function loadRows() {
 }
 let rows;
 try { rows = await loadRows(); }
-catch (e) { console.error(e); $('page').innerHTML = '<p class="loading">Rodoslov trenutno ne može da se učita.</p>'; return; }
+catch (e) { console.error(e); $('page').innerHTML = `<p class="loading">${esc(t('loadError'))}</p>`; return; }
 
 const rowById = new Map(rows.map(r => [r.id, r]));
 let isAdmin = false;
@@ -290,7 +459,8 @@ const topSur = [...surCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).m
 const clr = p => `var(--c${topSur.indexOf(p.prez) + 1})`;
 const dot = p => `<i style="background:${clr(p)}"></i>`;
 const name = p => `${p.ime}${p.nad ? ` „${p.nad}”` : ''} ${p.prez}`;
-const yr = y => y == null ? '' : y + '.';
+const yr = y => y == null ? '' : (lang === 'sr' ? y + '.' : String(y));
+const parentWord = p => t(p.sex === 'f' ? 'mother' : 'father');
 
 /* ---------- routes: '' home · #s<surname> one family's founders · #p<id> a person ---------- */
 const parse = () => {
@@ -307,61 +477,61 @@ function personRow(p, extra, sub) {
   const bits = sub ?? [p.god != null ? yr(p.god) : '', p.opis, p.mesto].filter(Boolean).join(' · ');
   const d = p.size - 1;
   return `<li><a class="row" href="${hrefOf(p)}">${dot(p)}<span class="nm"><b>${esc(name(p))}</b>${bits ? `<small>${esc(bits)}</small>` : ''}</span>
-    <span class="cnt">${extra ?? (d ? `+${fmt(d)}<span>potomaka</span>` : '')}</span>${chev}</a></li>`;
+    <span class="cnt">${extra ?? (d ? `+${fmt(d)}<span>${esc(t('descendants'))}</span>` : '')}</span>${chev}</a></li>`;
 }
 
 function viewHome() {
   const years = [...people.values()].map(p => p.god).filter(y => y != null);
-  return `<div class="hero"><div class="eyebrow">Porodica</div><h1>${esc(CFG.title)}</h1>
-    <p class="lede">Izaberite porodicu, pa idite niz loze dodirom na decu. Preci su uvek u traci na vrhu.</p>
-    <div class="stats"><div><b>${fmt(people.size)}</b><span>osoba</span></div><div><b>${roots.length}</b><span>loza</span></div><div><b>${Math.min(...years)}</b><span>najstariji zapis</span></div></div>
-    <div class="acts"><button type="button" class="btn primary" data-tree="">${treeIcon}Celo stablo</button><a class="btn" href="${esc(CFG.fullUrl)}&amp;add=1">${addIcon}Dodaj osobu</a></div></div>
-    <div class="sect"><h2>Porodice<span>${groupList.length}</span></h2><ul class="rows">${groupList.map(g =>
-      `<li><a class="row" href="${founderHref(g)}">${dot(g.rs[0])}<span class="nm"><b>${esc(g.sur)}</b><small>${g.rs.length > 1 ? `${g.rs.length} loza` : `začetnik: ${esc(name(g.rs[0]))}`}</small></span>
-        <span class="cnt">${fmt(g.size)}<span>osoba</span></span>${chev}</a></li>`).join('')}</ul></div>
-    <p class="foot">${isAdmin ? '<button type="button" class="linkbtn" data-open-review>Predlozi izmena</button>'
-      : '<button type="button" class="linkbtn" data-open-login>Prijava za urednike</button>'}</p>`;
+  return `<div class="hero"><div class="eyebrow">${esc(t('family'))}</div><h1>${esc(CFG.title)}</h1>
+    <p class="lede">${esc(t('homeLede'))}</p>
+    <div class="stats"><div><b>${fmt(people.size)}</b><span>${esc(t('people'))}</span></div><div><b>${roots.length}</b><span>${esc(t('lines'))}</span></div><div><b>${Math.min(...years)}</b><span>${esc(t('earliest'))}</span></div></div>
+    <div class="acts"><button type="button" class="btn primary" data-tree="">${treeIcon}${esc(t('wholeTree'))}</button><a class="btn" href="${esc(CFG.fullUrl)}&amp;add=1">${addIcon}${esc(t('addPerson'))}</a></div></div>
+    <div class="sect"><h2>${esc(t('families'))}<span>${groupList.length}</span></h2><ul class="rows">${groupList.map(g =>
+      `<li><a class="row" href="${founderHref(g)}">${dot(g.rs[0])}<span class="nm"><b>${esc(g.sur)}</b><small>${esc(g.rs.length > 1 ? t('nLines')(g.rs.length) : t('founderOf')(name(g.rs[0])))}</small></span>
+        <span class="cnt">${fmt(g.size)}<span>${esc(t('people'))}</span></span>${chev}</a></li>`).join('')}</ul></div>
+    <p class="foot">${isAdmin ? `<button type="button" class="linkbtn" data-open-review>${esc(t('reviewTitle'))}</button>`
+      : `<button type="button" class="linkbtn" data-open-login>${esc(t('editorLogin'))}</button>`}</p>`;
 }
 
 function viewFamily(sur) {
   const g = groupList.find(x => x.sur === sur);
-  return `<nav class="trail" id="trail"><a class="chip" href="#">Početak</a><span class="sep">›</span><span class="chip here">${esc(sur)}</span></nav>
-    <div class="card"><div class="eyebrow">${dot(g.rs[0])}Porodica</div><h1>${esc(sur)}</h1><p class="sub">${fmt(g.size)} osoba · ${g.rs.length} loza</p></div>
-    <div class="sect"><h2>Začetnici loza<span>${g.rs.length}</span></h2><ul class="rows">${g.rs.map(r => personRow(r)).join('')}</ul></div>`;
+  return `<nav class="trail" id="trail"><a class="chip" href="#">${esc(t('home'))}</a><span class="sep">›</span><span class="chip here">${esc(sur)}</span></nav>
+    <div class="card"><div class="eyebrow">${dot(g.rs[0])}${esc(t('family'))}</div><h1>${esc(sur)}</h1><p class="sub">${esc(t('famSub')(g.size, g.rs.length))}</p></div>
+    <div class="sect"><h2>${esc(t('founders'))}<span>${g.rs.length}</span></h2><ul class="rows">${g.rs.map(r => personRow(r)).join('')}</ul></div>`;
 }
 
 function viewPerson(p) {
   const anc = []; for (let q = p; q; q = q.par != null ? people.get(q.par) : null) anc.unshift(q);
   const g = groups.get(anc[0].prez || '?');
   const famChip = g && g.length > 1 ? `<a class="chip" href="#s${encodeURIComponent(anc[0].prez || '?')}">${esc(anc[0].prez)}</a><span class="sep">›</span>` : '';
-  const trail = `<nav class="trail" id="trail"><a class="chip" href="#" aria-label="Početak">⌂</a><span class="sep">›</span>${famChip}${anc.map(a =>
+  const trail = `<nav class="trail" id="trail"><a class="chip" href="#" aria-label="${esc(t('home'))}">⌂</a><span class="sep">›</span>${famChip}${anc.map(a =>
     a === p ? `<span class="chip here">${esc(a.ime)}${a.god != null ? ` <small>${a.god}</small>` : ''}</span>`
             : `<a class="chip" href="${hrefOf(a)}">${dot(a)}${esc(a.ime)}${a.god != null ? ` <small>${a.god}</small>` : ''}</a><span class="sep">›</span>`).join('')}</nav>`;
   const sibs = p.par != null ? people.get(p.par).kids : (g || [p]);
   const k = sibs.indexOf(p), prev = sibs[k - 1], next = sibs[k + 1];
-  const bits = [p.god != null ? `rođ. <b>${esc(yr(p.god))}</b>` : '', esc(p.opis), esc(p.mesto)].filter(Boolean).join(' · ');
+  const bits = [p.god != null ? `${esc(t('born'))} <b>${esc(yr(p.god))}</b>` : '', esc(p.opis), esc(p.mesto)].filter(Boolean).join(' · ');
   const facts = [];
-  if (p.sup) facts.push(['Supružnik', esc(p.sup)]);
-  if (p.izv) facts.push(['Izvor', esc(p.izv)]);
+  if (p.sup) facts.push([esc(t('spouse')), esc(p.sup)]);
+  if (p.izv) facts.push([esc(t('source')), esc(p.izv)]);
   const links = [...(p.brak != null ? [people.get(p.brak)] : []), ...p.spouseOf];
   return `${trail}
     <article class="card" id="card">
-      <div class="eyebrow">${dot(p)}${esc(p.prez || 'nepoznato')} · ${p.gen}. generacija</div>
+      <div class="eyebrow">${dot(p)}${esc(p.prez || t('unknown'))} · ${esc(t('gen')(p.gen))}</div>
       <h1>${esc(p.ime)}${p.nad ? ` <em>„${esc(p.nad)}”</em>` : ''} ${esc(p.prez)}</h1>
       ${bits ? `<p class="sub">${bits}</p>` : ''}
       ${facts.length ? `<dl class="facts">${facts.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl>` : ''}
-      ${p.nap ? `<details class="note"${p.nap.length < 140 ? ' open' : ''}><summary>Napomena</summary><p>${esc(p.nap)}</p></details>` : ''}
-      <div class="acts"><button type="button" class="btn primary" data-tree="${p.id}">${treeIcon}Pogledaj stablo</button><a class="btn" href="${esc(CFG.fullUrl)}#p${p.id}">Uredi · dodaj dete</a><a class="btn" href="${esc(CFG.fullUrl)}&amp;print=1#p${p.id}">${printIcon}Preuzmi pdf</a></div>
+      ${p.nap ? `<details class="note"${p.nap.length < 140 ? ' open' : ''}><summary>${esc(t('note'))}</summary><p>${esc(p.nap)}</p></details>` : ''}
+      <div class="acts"><button type="button" class="btn primary" data-tree="${p.id}">${treeIcon}${esc(t('viewTree'))}</button><a class="btn" href="${esc(CFG.fullUrl)}#p${p.id}">${esc(t('editAdd'))}</a><a class="btn" href="${esc(CFG.fullUrl)}&amp;print=1#p${p.id}">${printIcon}${esc(t('pdf'))}</a></div>
     </article>
-    ${sibs.length > 1 ? `<div class="sibs" aria-label="Braća i sestre">
-      ${prev ? `<a href="${hrefOf(prev)}" data-dir="back" aria-label="Prethodni: ${esc(name(prev))}">‹</a>` : '<span class="off">‹</span>'}
-      <div class="mid"><b>${p.par != null ? 'Dete' : 'Začetnik'} ${k + 1} od ${sibs.length}</b>prevucite karticu levo ili desno</div>
-      ${next ? `<a href="${hrefOf(next)}" aria-label="Sledeći: ${esc(name(next))}">›</a>` : '<span class="off">›</span>'}
+    ${sibs.length > 1 ? `<div class="sibs" aria-label="${esc(t('siblings'))}">
+      ${prev ? `<a href="${hrefOf(prev)}" data-dir="back" aria-label="${esc(t('prev'))}: ${esc(name(prev))}">‹</a>` : '<span class="off">‹</span>'}
+      <div class="mid"><b>${esc(t(p.par != null ? 'childKofN' : 'founderKofN')(k + 1, sibs.length))}</b>${esc(t('swipe'))}</div>
+      ${next ? `<a href="${hrefOf(next)}" aria-label="${esc(t('next'))}: ${esc(name(next))}">›</a>` : '<span class="off">›</span>'}
     </div>` : ''}
-    <div class="sect"><h2>Deca<span>${p.kids.length || ''}</span></h2>${p.kids.length
-      ? `<ul class="rows">${p.kids.map(c => personRow(c)).join('')}</ul>` : '<p class="empty">Nema upisane dece.</p>'}</div>
-    ${links.length ? `<div class="sect"><h2>Brak u stablu</h2><ul class="rows">${links.map(o => personRow(o, '')).join('')}</ul></div>` : ''}
-    ${sibs.length > 1 ? `<div class="sect"><h2>${p.par != null ? 'Braća i sestre' : 'Ostali začetnici'}<span>${sibs.length - 1}</span></h2><ul class="rows">${sibs.filter(s => s !== p).map(s => personRow(s)).join('')}</ul></div>` : ''}`;
+    <div class="sect"><h2>${esc(t('children'))}<span>${p.kids.length || ''}</span></h2>${p.kids.length
+      ? `<ul class="rows">${p.kids.map(c => personRow(c)).join('')}</ul>` : `<p class="empty">${esc(t('noKids'))}</p>`}</div>
+    ${links.length ? `<div class="sect"><h2>${esc(t('inTree'))}</h2><ul class="rows">${links.map(o => personRow(o, '')).join('')}</ul></div>` : ''}
+    ${sibs.length > 1 ? `<div class="sect"><h2>${esc(t(p.par != null ? 'siblings' : 'otherFounders'))}<span>${sibs.length - 1}</span></h2><ul class="rows">${sibs.filter(s => s !== p).map(s => personRow(s)).join('')}</ul></div>` : ''}`;
 }
 
 /* ---------- render + transitions ---------- */
@@ -373,7 +543,7 @@ function render() {
   const up = r.kind === 'p' ? (r.p.par != null ? hrefOf(people.get(r.p.par))
     : (groups.get(r.p.prez || '?') || []).length > 1 ? '#s' + encodeURIComponent(r.p.prez) : '#') : '#';
   $('bUp').href = up; $('bUp').classList.toggle('off', r.kind === 'home');
-  $('lUp').textContent = r.kind === 'p' && r.p.par != null ? (people.get(r.p.par).sex === 'f' ? 'Majka' : 'Otac') : 'Gore';
+  $('lUp').textContent = r.kind === 'p' && r.p.par != null ? t(people.get(r.p.par).sex === 'f' ? 'motherUp' : 'fatherUp') : t('up');
   const tr = $('trail'); if (tr) tr.scrollLeft = tr.scrollWidth;
   window.scrollTo(0, 0);
   cur = r;
@@ -409,7 +579,7 @@ if (history.state && history.state.tree) history.replaceState(null, '');  // lef
 function openTree(id) {
   treeEl = document.createElement('div');
   treeEl.className = 'treefull';
-  treeEl.innerHTML = `<p>Učitavanje stabla…</p><iframe title="Stablo" src="${esc(CFG.treeUrl)}?view=tree${id ? '#p' + id : ''}"></iframe>`;
+  treeEl.innerHTML = `<p>${esc(t('loadingTree'))}</p><iframe title="${esc(t('tree'))}" src="${esc(CFG.treeUrl)}?view=tree${id ? '#p' + id : ''}"></iframe>`;
   treeEl.querySelector('iframe').onload = () => { if (treeEl) treeEl.querySelector('p')?.remove(); };
   document.body.appendChild(treeEl);
   document.body.style.overflow = 'hidden';
@@ -441,14 +611,14 @@ const index = [...people.values()].map(p => ({ p, hay: fold([p.ime, p.nad, p.pre
 const q = $('q'), res = $('qRes');
 function search() {
   const toks = fold(q.value).split(/\s+/).filter(Boolean);
-  if (!toks.length) { res.innerHTML = '<p class="empty">Upišite ime, prezime, mesto ili godinu rođenja.</p>'; return; }
+  if (!toks.length) { res.innerHTML = `<p class="empty">${esc(t('searchHint'))}</p>`; return; }
   const out = index.filter(e => toks.every(t => e.hay.includes(t)))
     .map(e => [toks.reduce((s, t) => s + (e.ime === t ? 6 : e.ime.startsWith(t) ? 4 : 1), 0), e.p])
     .sort((a, b) => b[0] - a[0] || (a[1].god ?? 9999) - (b[1].god ?? 9999));
-  res.innerHTML = out.length ? `<p class="count">${out.length} ${out.length === 1 ? 'rezultat' : 'rezultata'}</p><ul class="rows">${out.slice(0, 50).map(([, p]) => {
+  res.innerHTML = out.length ? `<p class="count">${esc(t('results')(out.length))}</p><ul class="rows">${out.slice(0, 50).map(([, p]) => {
     const par = p.par != null ? people.get(p.par) : null;  // the parent tells namesakes apart
-    return personRow(p, p.god != null ? String(p.god) : '', par ? `${par.sex === 'f' ? 'majka' : 'otac'}: ${name(par)}` : 'začetnik loze');
-  }).join('')}</ul>` : '<p class="empty">Nema rezultata.</p>';
+    return personRow(p, p.god != null ? String(p.god) : '', par ? `${parentWord(par)}: ${name(par)}` : t('lineRoot'));
+  }).join('')}</ul>` : `<p class="empty">${esc(t('noResults'))}</p>`;
 }
 const openSearch = () => { $('sheet').hidden = false; q.focus(); search(); };
 const closeSearch = () => { $('sheet').hidden = true; q.blur(); };
@@ -458,9 +628,7 @@ q.addEventListener('input', search);
 res.addEventListener('click', e => { if (e.target.closest('a')) closeSearch(); });
 
 /* ---------- editors: sign in and approve or reject suggestions without leaving the phone view ---------- */
-const FIELDS = { ime: 'Ime', nadimak: 'Nadimak', prezime: 'Prezime', rodjen: 'Godina rođenja', pol: 'Pol', opis: 'Zanimanje',
-  mesto: 'Mesto', supruznik: 'Supružnik', izvor: 'Izvor', napomena: 'Napomena' };
-const showVal = (k, v) => v == null || v === '' ? '<span class="none">prazno</span>' : esc(k === 'pol' ? (v === 'f' ? 'ženski' : v === 'm' ? 'muški' : v) : v);
+const showVal = (k, v) => v == null || v === '' ? `<span class="none">${esc(t('empty'))}</span>` : esc(k === 'pol' ? (v === 'f' ? t('sexF') : v === 'm' ? t('sexM') : v) : v);
 const openSheet = id => { $(id).hidden = false; document.body.style.overflow = 'hidden'; };
 const closeSheet = id => { $(id).hidden = true; document.body.style.overflow = ''; };
 let reloadTo = null;   // an approved new person changes the tree's shape: reload onto them once the queue closes
@@ -490,7 +658,7 @@ $('loginForm').addEventListener('submit', async e => {
   try {
     const { error } = await sb.auth.signInWithPassword({ email: f.elements.email.value.trim(), password: f.elements.password.value });
     if (error) throw error;
-    if (!await checkAdmin()) { await sb.auth.signOut(); throw new Error('Ovaj nalog nema urednička prava.'); }
+    if (!await checkAdmin()) { await sb.auth.signOut(); throw new Error(t('notAdmin')); }
     f.reset(); closeSheet('loginSheet'); openReview();
   } catch (x) { err.textContent = x.message || String(x); err.hidden = false; }
   finally { btn.disabled = false; }
@@ -498,44 +666,44 @@ $('loginForm').addEventListener('submit', async e => {
 function sgCard(s) {
   const p = people.get(s.person_id), raw = rowById.get(s.person_id) || {}, c = s.changes || {};
   const isNew = s.kind === 'add_child' || s.kind === 'add_root';
-  const who = [s.author || 'anonimno', s.contact, new Date(s.created_at).toLocaleString('sr-Latn', { dateStyle: 'medium', timeStyle: 'short' })].filter(Boolean).map(esc).join(' · ');
+  const who = [s.author || t('anon'), s.contact, new Date(s.created_at).toLocaleString(LOCALE[lang], { dateStyle: 'medium', timeStyle: 'short' })].filter(Boolean).map(esc).join(' · ');
   let head;
   if (s.kind === 'link') {   // a marriage link: both people, and the link it would replace
     const sp = people.get(c.brak_id), now = p && p.brak != null ? people.get(p.brak) : null;
     const who2 = q => q ? `<a class="ttl" href="#p${q.id}" data-go>${esc(name(q))}</a>` : `<div class="ttl">#${esc(c.brak_id)}</div>`;
-    const line = q => q ? esc([q.god != null ? yr(q.god) : '', q.par != null ? `${people.get(q.par).sex === 'f' ? 'majka' : 'otac'}: ${name(people.get(q.par))}` : 'začetnik loze'].filter(Boolean).join(' · ')) : '';
-    return `<article class="sg" data-id="${s.id}"><div class="eyebrow">Povezivanje braka</div>
+    const line = q => q ? esc([q.god != null ? yr(q.god) : '', q.par != null ? `${parentWord(people.get(q.par))}: ${name(people.get(q.par))}` : t('lineRoot')].filter(Boolean).join(' · ')) : '';
+    return `<article class="sg" data-id="${s.id}"><div class="eyebrow">${esc(t('linkBadge'))}</div>
       ${who2(p)}<div class="who">${line(p)}</div><div class="ttl" aria-hidden="true">∞</div>${who2(sp)}<div class="who">${line(sp)}</div>
       <div class="who">${who}</div>
-      <dl class="chg"><div><dt>Brak u stablu</dt><dd><span class="old">${now ? esc(name(now)) : '<span class="none">prazno</span>'}</span><span class="new">${sp ? esc(name(sp)) : '#' + esc(c.brak_id)}</span></dd></div></dl>
+      <dl class="chg"><div><dt>${esc(t('inTree'))}</dt><dd><span class="old">${now ? esc(name(now)) : `<span class="none">${esc(t('empty'))}</span>`}</span><span class="new">${sp ? esc(name(sp)) : '#' + esc(c.brak_id)}</span></dd></div></dl>
       ${s.comment ? `<p class="note2">${esc(s.comment)}</p>` : ''}
       <p class="msg err" hidden></p>
-      <div class="acts"><button type="button" class="btn" data-do="reject">Odbij</button><button type="button" class="btn primary" data-do="approve">Odobri</button></div></article>`;
+      <div class="acts"><button type="button" class="btn" data-do="reject">${esc(t('reject'))}</button><button type="button" class="btn primary" data-do="approve">${esc(t('approve'))}</button></div></article>`;
   }
   if (s.kind === 'add_root') {
     const fam = groupList.find(g => fold(g.sur) === fold(c.prezime));
-    head = `<div class="eyebrow">Nova osoba bez roditelja · ${fam ? `ide u porodicu ${esc(fam.sur)}` : 'novo prezime u stablu'}</div>
+    head = `<div class="eyebrow">${esc(t('rootBadge'))} · ${esc(fam ? t('joinsFamily')(fam.sur) : t('newFamily'))}</div>
       <div class="ttl">${esc([c.ime, c.nadimak ? `„${c.nadimak}”` : '', c.prezime].filter(Boolean).join(' '))}</div>`;
   } else {
-    head = `<div class="eyebrow">${s.kind === 'add_child' ? 'Novo dete osobe' : 'Izmena'}</div>
+    head = `<div class="eyebrow">${esc(t(s.kind === 'add_child' ? 'childOf' : 'change'))}</div>
       ${p ? `<a class="ttl" href="#p${p.id}" data-go>${esc(name(p))}</a>` : `<div class="ttl">#${esc(s.person_id)}</div>`}`;
   }
-  const rowsHtml = Object.entries(c).map(([k, v]) => `<div><dt>${esc(FIELDS[k] || k)}</dt><dd>${isNew ? '' : `<span class="old">${showVal(k, raw[k])}</span>`}<span class="new">${showVal(k, v)}</span></dd></div>`).join('');
+  const rowsHtml = Object.entries(c).map(([k, v]) => `<div><dt>${esc(t('fields')[k] || k)}</dt><dd>${isNew ? '' : `<span class="old">${showVal(k, raw[k])}</span>`}<span class="new">${showVal(k, v)}</span></dd></div>`).join('');
   return `<article class="sg${s.kind === 'add_root' ? ' root' : ''}" data-id="${s.id}">${head}<div class="who">${who}</div>
     <dl class="chg">${rowsHtml}</dl>${s.comment ? `<p class="note2">${esc(s.comment)}</p>` : ''}
     <p class="msg err" hidden></p>
-    <div class="acts"><button type="button" class="btn" data-do="reject">Odbij</button><button type="button" class="btn primary" data-do="approve">Odobri</button></div></article>`;
+    <div class="acts"><button type="button" class="btn" data-do="reject">${esc(t('reject'))}</button><button type="button" class="btn primary" data-do="approve">${esc(t('approve'))}</button></div></article>`;
 }
 async function openReview() {
   openSheet('revSheet');
   const body = $('revBody');
-  body.innerHTML = '<p class="msg">Učitavanje predloga…</p>';
+  body.innerHTML = `<p class="msg">${esc(t('loadingSugg'))}</p>`;
   const { data, error } = await sb.from('suggestions').select('*').eq('status', 'pending').order('created_at');
   const list = error ? [] : data;
-  body.innerHTML = (error ? `<p class="msg err">Predlozi trenutno ne mogu da se učitaju: ${esc(error.message)}</p>`
-    : `<p class="msg" id="revLede" style="margin-bottom:12px">${list.length ? `${list.length} na čekanju. Odobreni predlog se odmah primenjuje; odbijeni ostaje zabeležen.` : 'Nema predloga na čekanju.'}</p>`)
+  body.innerHTML = (error ? `<p class="msg err">${esc(t('suggError'))}${esc(error.message)}</p>`
+    : `<p class="msg" id="revLede" style="margin-bottom:12px">${esc(list.length ? t('reviewLede')(list.length) : t('nothingPending'))}</p>`)
     + list.map(sgCard).join('')
-    + '<p class="foot"><button type="button" class="linkbtn" data-signout>Odjavi se</button></p>';
+    + `<p class="foot"><button type="button" class="linkbtn" data-signout>${esc(t('signOut'))}</button></p>`;
 }
 // an approved edit applies here at once; the review stays open
 function applyRow(r) {
@@ -564,10 +732,10 @@ $('revBody').addEventListener('click', async e => {
     }
     card.remove();
     const left = $('revBody').querySelectorAll('.sg').length;
-    $('revLede').textContent = left ? `${left} na čekanju. Odobreni predlog se odmah primenjuje; odbijeni ostaje zabeležen.` : 'Nema predloga na čekanju.';
+    $('revLede').textContent = left ? t('reviewLede')(left) : t('nothingPending');
     refreshPending();
   } catch (x) {
-    msg.textContent = 'Nije uspelo: ' + (x.message || String(x)); msg.hidden = false;
+    msg.textContent = t('failed') + (x.message || String(x)); msg.hidden = false;
     card.querySelectorAll('button[data-do]').forEach(y => { y.disabled = false; });
   }
 });
@@ -577,6 +745,8 @@ $('page').addEventListener('click', e => {
 });
 $('bRev').onclick = openReview;
 checkAdmin();
+// a new language redraws the page, and the search results or the review queue when one is open
+onLang = () => { render(); if (!$('sheet').hidden) search(); if (!$('revSheet').hidden) openReview(); };
 
 /* ---------- one-time welcome: suggesting changes, adding a person, the PDF (same flag as the main page) ---------- */
 (function welcome() {
@@ -588,14 +758,14 @@ checkAdmin();
   const el = document.createElement('div');
   el.className = 'welcome';
   el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'welcomeT');
-  el.innerHTML = `<div class="box"><div class="eyebrow">${esc(CFG.short)}</div><h2 id="welcomeT">Dobro došli u rodoslov</h2>
-    <p class="lede">Ovo stablo pravimo zajedno. Evo šta možete da uradite:</p>
+  el.innerHTML = `<div class="box"><div class="eyebrow">${esc(CFG.short)}</div><h2 id="welcomeT">${esc(t('welcomeTitle'))}</h2>
+    <p class="lede">${esc(t('welcomeLede'))}</p>
     <ul>
-      <li>${icon('<path d="M10.5 2.5l3 3L6 13H3v-3z"></path>')}<div><b>Predložite izmenu</b><p>Kod svake osobe dodirnite ${tag('Uredi · dodaj dete')} da ispravite ili dopunite podatke, ili dodate dete. Izmena se pojavljuje kada je urednik odobri.</p></div></li>
-      <li>${icon('<circle cx="8" cy="5.5" r="2.5"></circle><path d="M3 14c.6-2.6 2.6-4 5-4M12 10v4M10 12h4"></path>')}<div><b>Dodajte osobu</b><p>Ako vašeg pretka nema u stablu, a ne znate mu roditelje, dodirnite ${tag('Dodaj osobu')} na početnoj strani. Nova osoba započinje svoju lozu.</p></div></li>
-      <li>${icon('<path d="M8 14.6V8.4M8 8.4 4.6 5.4M8 8.4l3.4-3M8 8.4V4.2M8 11 5.2 9.4M6.4 14.6h3.2"></path>')}<div><b>Preuzmite svoju lozu</b><p>Otvorite osobu i dodirnite ${tag('Preuzmi pdf')}: dobijate njene pretke i potomke kao PDF, spreman za štampu.</p></div></li>
+      <li>${icon('<path d="M10.5 2.5l3 3L6 13H3v-3z"></path>')}<div><b>${esc(t('tipEditT'))}</b><p>${t('tipEdit')(tag(t('editAdd')))}</p></div></li>
+      <li>${icon('<circle cx="8" cy="5.5" r="2.5"></circle><path d="M3 14c.6-2.6 2.6-4 5-4M12 10v4M10 12h4"></path>')}<div><b>${esc(t('tipAddT'))}</b><p>${t('tipAdd')(tag(t('addPerson')))}</p></div></li>
+      <li>${icon('<path d="M8 14.6V8.4M8 8.4 4.6 5.4M8 8.4l3.4-3M8 8.4V4.2M8 11 5.2 9.4M6.4 14.6h3.2"></path>')}<div><b>${esc(t('tipPdfT'))}</b><p>${t('tipPdf')(tag(t('pdf')))}</p></div></li>
     </ul>
-    <button type="button" class="btn primary ok">Razumem</button></div>`;
+    <button type="button" class="btn primary ok">${esc(t('gotIt'))}</button></div>`;
   const close = () => {
     el.remove(); document.removeEventListener('keydown', onKey);
     try { localStorage.setItem('stablo.welcome', '1'); } catch (e) {}
