@@ -614,17 +614,25 @@ $('page').addEventListener('click', e => {
 /* ---------- search sheet ---------- */
 const CYR = { 'а':'a','б':'b','в':'v','г':'g','д':'d','ђ':'đ','е':'e','ж':'ž','з':'z','и':'i','ј':'j','к':'k','л':'l','љ':'lj','м':'m','н':'n','њ':'nj','о':'o','п':'p','р':'r','с':'s','т':'t','ћ':'ć','у':'u','ф':'f','х':'h','ц':'c','ч':'č','џ':'dž','ш':'š' };
 const fold = s => String(s || '').toLowerCase().replace(/[а-яђјљњћџ]/g, c => CYR[c] || c).replace(/đ/g, 'dj').normalize('NFD').replace(/[̀-ͯ]/g, '');
-const index = [...people.values()].map(p => ({ p, hay: fold([p.ime, p.nad, p.prez, p.mesto, p.opis, p.god].join(' ')), ime: fold(p.ime) }));
+const index = [...people.values()].map(p => ({ p, hay: fold([p.ime, p.nad, p.prez, p.mesto, p.opis, p.god].join(' ')), ime: fold(p.ime), nap: fold(p.nap) }));
+// the part of a note that holds the search words, for showing why a person matched
+const noteSnippet = (nap, toks) => {
+  const hit = nap.split(/;\s*/).find(s => toks.some(tk => fold(s).includes(tk))) || nap;
+  return hit.length > 90 ? hit.slice(0, 88) + '…' : hit;
+};
 const q = $('q'), res = $('qRes');
 function search() {
   const toks = fold(q.value).split(/\s+/).filter(Boolean);
   if (!toks.length) { res.innerHTML = `<p class="empty">${esc(t('searchHint'))}</p>`; return; }
-  const out = index.filter(e => toks.every(t => e.hay.includes(t)))
-    .map(e => [toks.reduce((s, t) => s + (e.ime === t ? 6 : e.ime.startsWith(t) ? 4 : 1), 0), e.p])
+  // editors also find words in the notes; such a match ranks below the person's own details
+  const out = index.filter(e => toks.every(t => e.hay.includes(t) || (isAdmin && e.nap.includes(t))))
+    .map(e => [toks.reduce((s, t) => s + (e.ime === t ? 6 : e.ime.startsWith(t) ? 4 : e.hay.includes(t) ? 1 : .5), 0), e.p,
+      toks.some(t => !e.hay.includes(t))])
     .sort((a, b) => b[0] - a[0] || (a[1].god ?? 9999) - (b[1].god ?? 9999));
-  res.innerHTML = out.length ? `<p class="count">${esc(t('results')(out.length))}</p><ul class="rows">${out.slice(0, 50).map(([, p]) => {
+  res.innerHTML = out.length ? `<p class="count">${esc(t('results')(out.length))}</p><ul class="rows">${out.slice(0, 50).map(([, p, inNote]) => {
     const par = p.par != null ? people.get(p.par) : null;  // the parent tells namesakes apart
-    return personRow(p, p.god != null ? String(p.god) : '', par ? `${parentWord(par)}: ${name(par)}` : t('lineRoot'));
+    const rel = par ? `${parentWord(par)}: ${name(par)}` : t('lineRoot');
+    return personRow(p, p.god != null ? String(p.god) : '', inNote ? `${t('note')}: ${noteSnippet(p.nap, toks)} · ${rel}` : rel);
   }).join('')}</ul>` : `<p class="empty">${esc(t('noResults'))}</p>`;
 }
 const openSearch = () => { $('sheet').hidden = false; q.focus(); search(); };

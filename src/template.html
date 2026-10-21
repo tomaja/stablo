@@ -104,6 +104,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .res .nm { font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .res .yr { font: 12px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
 .res .ctx { grid-column: 2 / 4; font-size: 12px; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.res .ctx.nt { color: var(--ink); font-style: italic; }
 .res mark { background: none; color: var(--accent); font-weight: 600; }
 .noresults { padding: 14px 10px; color: var(--muted); }
 .langwrap { position: relative; }
@@ -2303,29 +2304,44 @@ const foldD = s => fold(s.toLowerCase().replace(/đ/g, 'd'));
 function indexEntry(p) {
   const base = [p.ime, p.nad, p.prez].join(' ');
   const hay = fold(base) + ' ' + foldD(base) + ' ' + fold(p.mesto) + ' ' + fold(p.opis) + ' ' + (p.god ?? '');
-  return { p, hay, ime: fold(p.ime), ime2: foldD(p.ime), prez: fold(p.prez), prez2: foldD(p.prez), nad: foldD(p.nad) };
+  // the note is searched only for editors (searchPeople checks isAdmin), and ranks below the person's own details
+  return { p, hay, nap: p.nap ? fold(p.nap) + ' ' + foldD(p.nap) : '', ime: fold(p.ime), ime2: foldD(p.ime), prez: fold(p.prez), prez2: foldD(p.prez), nad: foldD(p.nad) };
+}
+// the part of a note that holds the search words, for showing why a person matched
+function noteSnippet(nap, text) {
+  const toks = fold(text).split(/\s+/).filter(Boolean);
+  const parts = nap.split(/;\s*/);
+  const hit = parts.find(s => toks.some(tk => fold(s).includes(tk) || foldD(s).includes(tk))) || nap;
+  return hit.length > 110 ? hit.slice(0, 108) + '…' : hit;
 }
 const index = [...people.values()].map(indexEntry);
 function reindex(p) { const k = index.findIndex(e => e.p === p); if (k >= 0) index[k] = indexEntry(p); }
 const q = document.getElementById('q'), resEl = document.getElementById('results');
-let results = [], active = 0;
+let results = [], active = 0, noteHits = new Set();
 // people matching the words, best first, as [score, person]
 function searchPeople(text) {
   const toks = fold(text).split(/\s+/).filter(Boolean);
   const out = [];
   if (!toks.length) return out;
   for (const e of index) {
-    let score = 0, ok = true;
+    let score = 0, ok = true, inNote = false;
     for (const tk of toks) {
-      if (/^\d{3,4}$/.test(tk)) { if (String(e.p.god ?? '').startsWith(tk)) { score += tk.length === 4 ? 4 : 2; continue; } ok = false; break; }
-      if (!e.hay.includes(tk)) { ok = false; break; }
+      if (/^\d{3,4}$/.test(tk)) {
+        if (String(e.p.god ?? '').startsWith(tk)) { score += tk.length === 4 ? 4 : 2; continue; }
+        if (isAdmin && e.nap.includes(tk)) { score += .5; inNote = true; continue; }
+        ok = false; break;
+      }
+      if (!e.hay.includes(tk)) {
+        if (isAdmin && e.nap.includes(tk)) { score += .5; inNote = true; continue; }
+        ok = false; break;
+      }
       if (e.ime === tk || e.ime2 === tk) score += 6;
       else if (e.ime.startsWith(tk) || e.ime2.startsWith(tk)) score += 4;
       else if (e.prez.startsWith(tk) || e.prez2.startsWith(tk)) score += 3;
       else if (e.nad && e.nad.startsWith(tk)) score += 4;
       else score += 1;
     }
-    if (ok) out.push([score, e.p]);
+    if (ok) out.push([score, e.p, inNote]);
   }
   return out.sort((a, b) => (b[0] - a[0]) || ((a[1].god ?? 9999) - (b[1].god ?? 9999)) || (a[1].id - b[1].id));
 }
@@ -2333,6 +2349,7 @@ function runSearch() {
   if (!q.value.trim()) { resEl.hidden = true; results = []; return; }
   const out = searchPeople(q.value);
   results = out.slice(0, 60).map(x => x[1]); active = 0;
+  noteHits = new Set(out.slice(0, 60).filter(x => x[2]).map(x => x[1]));
   renderResults(out.length);
 }
 function renderResults(total) {
@@ -2340,7 +2357,7 @@ function renderResults(total) {
   resEl.innerHTML = `<div class="count">${esc(t('results')(total))}</div>` + results.map((p, k) => {
     const par = p.par != null ? people.get(p.par) : null;
     const ctxBits = [par ? `${parentWord(par)}: ${plainName(par)}${par.god != null ? ' (' + yr(par.god) + ')' : ''}` : t('lineRoot'), p.mesto, p.opis].filter(Boolean).join(' · ');
-    return `<div class="res" role="option" id="r${k}" data-k="${k}" aria-selected="${k === active}">${dot(p)}<span class="nm">${esc(plainName(p))}</span><span class="yr">${p.god != null ? esc(yr(p.god)) : ''}</span><span class="ctx">${esc(ctxBits)}</span></div>`;
+    return `<div class="res" role="option" id="r${k}" data-k="${k}" aria-selected="${k === active}">${dot(p)}<span class="nm">${esc(plainName(p))}</span><span class="yr">${p.god != null ? esc(yr(p.god)) : ''}</span><span class="ctx">${esc(ctxBits)}</span>${noteHits.has(p) ? `<span class="ctx nt">${esc(t('note'))}: ${esc(noteSnippet(p.nap, q.value))}</span>` : ''}</div>`;
   }).join('');
   resEl.hidden = false;
 }
