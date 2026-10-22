@@ -1,5 +1,5 @@
 // POST /api/notify: Supabase calls this for each new suggestion (trigger notify_suggestion, see
-// supabase/migrations/20261022000000_push_notifications.sql) with the suggestion and the editors' devices.
+// supabase/migrations/20261022000100_push_notifications_functions.sql) with the suggestion and the editors' devices.
 // Secrets of the Pages project: NOTIFY_SECRET (shared with Supabase's Vault), VAPID_PRIVATE_JWK, SUPABASE_URL, SUPABASE_KEY.
 import { send } from '../../lib/webpush.js';
 
