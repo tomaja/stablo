@@ -308,9 +308,13 @@ def main():
     key = env.get("SUPABASE_KEY", "")
     if not url or not key:
         sys.exit("Set SUPABASE_URL and SUPABASE_KEY (the anon / publishable key) in .env")
-    cfg = json.dumps({"title": TITLE, "short": SHORT, "supabaseUrl": url, "supabaseKey": key}, ensure_ascii=False)
+    # editors' browser notifications: the public half of the VAPID key, and the code shared by both pages
+    vapid = env.get("VAPID_PUBLIC", "")
+    push_js = (ROOT / "src" / "push.js").read_text(encoding="utf-8")
+    cfg = json.dumps({"title": TITLE, "short": SHORT, "supabaseUrl": url, "supabaseKey": key, "vapidPublic": vapid}, ensure_ascii=False)
     tpl = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
-    page = tpl.replace("{{TITLE}}", TITLE).replace("__CONFIG__", cfg.replace("</", "<\/"))
+    page = (tpl.replace("{{TITLE}}", TITLE).replace("__CONFIG__", cfg.replace("</", "<\/"))
+            .replace("/*__PUSH__*/", push_js))
 
     (ROOT / "build").mkdir(exist_ok=True)
     # the artifact is a single page, so it never sends phones to the phone view
@@ -326,10 +330,18 @@ def main():
 
     # phone view: same data, one person per screen; it opens the main page for editing (?full) and for the disk (?view=tree)
     phone_cfg = json.dumps({"title": TITLE, "short": SHORT, "supabaseUrl": url, "supabaseKey": key,
-                            "fullUrl": "./?full=1", "treeUrl": "./"}, ensure_ascii=False)
+                            "fullUrl": "./?full=1", "treeUrl": "./", "vapidPublic": vapid}, ensure_ascii=False)
     phone = ((ROOT / "src" / "phone.html").read_text(encoding="utf-8")
-             .replace("{{TITLE}}", TITLE).replace("__CONFIG__", phone_cfg.replace("</", "<\\/")))
+             .replace("{{TITLE}}", TITLE).replace("__CONFIG__", phone_cfg.replace("</", "<\\/"))
+             .replace("/*__PUSH__*/", push_js))
     (ROOT / "site" / "telefon.html").write_text(phone, encoding="utf-8")
+
+    # service worker (shows the notifications), web-app manifest (iPhones allow push only from the Home Screen), icons
+    (ROOT / "site" / "sw.js").write_text((ROOT / "src" / "sw.js").read_text(encoding="utf-8"), encoding="utf-8")
+    (ROOT / "site" / "manifest.webmanifest").write_text((ROOT / "src" / "manifest.webmanifest").read_text(encoding="utf-8")
+        .replace("{{TITLE}}", TITLE).replace("{{SHORT}}", SHORT), encoding="utf-8")
+    for icon in (ROOT / "src" / "icons").glob("*.png"):
+        (ROOT / "site" / icon.name).write_bytes(icon.read_bytes())
     print(f"site/index.html ({len(full) // 1024} KB), site/telefon.html, build/artifact.html - data loads from {url}")
 
 

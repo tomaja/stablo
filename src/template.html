@@ -1,6 +1,8 @@
 <title>{{TITLE}}</title>
 <!-- favicon: the Preuzmi pdf tree, in the accent color -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cstyle%3Esvg{color:%238c2a4d}@media(prefers-color-scheme:dark){svg{color:%23e985a9}}%3C/style%3E%3Cpath d='M8 14.6V8.4M8 8.4 4.6 5.4M8 8.4l3.4-3M8 8.4V4.2M8 11 5.2 9.4M6.4 14.6h3.2'/%3E%3Ccircle cx='4' cy='4.8' r='1.3' fill='currentColor' stroke='none'/%3E%3Ccircle cx='12' cy='4.8' r='1.3' fill='currentColor' stroke='none'/%3E%3Ccircle cx='8' cy='3' r='1.3' fill='currentColor' stroke='none'/%3E%3Ccircle cx='4.6' cy='9' r='1.1' fill='currentColor' stroke='none'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script>
 // phones get the phone view, unless the full page was asked for (?full=1 from its edit link, ?view=tree for its disk, #admin)
 (function (phone) {
@@ -271,6 +273,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .fld .dirty { border-color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 60%, var(--raise)); }
 .sep { border: 0; border-top: 1px solid var(--line); margin: 0; }
 .dlg-f { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+/* editors' notification switch in the review panel */
+.pushctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-right: auto; }
+.pushctl .btn svg { flex: none; }
+.pushnote { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.pushnote.err { color: var(--accent); }
 .msg { margin: 0; padding: 10px 12px; border-radius: 8px; font-size: 13.5px; background: var(--raise); border: 1px solid var(--line); }
 .msg.err { border-color: var(--accent); color: var(--accent); }
 .msg.ok { border-color: var(--c2); }
@@ -415,6 +422,8 @@ const TREE_ONLY = new URLSearchParams(location.search).get('view') === 'tree';
 if (TREE_ONLY) document.documentElement.classList.add('tree-only');
 const CFG = __CONFIG__;
 const sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
+/*__PUSH__*/
+const push = makePush(sb, CFG.vapidPublic);
 
 /* ---------- i18n ---------- */
 const T = {
@@ -453,6 +462,8 @@ const T = {
     linkLedeAdmin: 'Prijavljeni ste kao urednik: veza se odmah dodaje.',
     linkFind: 'Ime, prezime, mesto ili godina supružnika', linkReplace: 'Novi izbor zamenjuje trenutnu vezu.',
     linkPick: 'Izaberite osobu sa spiska.', linkSame: 'Ova veza već postoji.',
+    pushOn: 'Uključi obaveštenja', pushOff: 'Isključi', pushIsOn: 'Obaveštenja o novim predlozima stižu na ovaj uređaj.',
+    pushDenied: 'Obaveštenja su blokirana u podešavanjima pretraživača.', pushIos: 'Za obaveštenja na iPhone-u: Podeli → Dodaj na početni ekran, pa otvorite sajt odatle.',
     kinNone: 'nema upisane dece', kinHint: 'Proverite pretke i decu, jer mnogo osoba ima isto ime i prezime.',
     welcomeTitle: 'Dobro došli u rodoslov', welcomeLede: 'Ovo stablo pravimo zajedno. Evo šta možete da uradite:', gotIt: 'Razumem',
     tipEditT: 'Predložite izmenu', tipEdit: (a, b) => `Kod svake osobe kliknite ${a} da ispravite ili dopunite podatke, ili ${b}. Izmena se pojavljuje kada je urednik odobri.`,
@@ -517,6 +528,8 @@ const T = {
     linkLedeAdmin: 'You are signed in as an editor: the link is added right away.',
     linkFind: 'Spouse’s name, surname, place or year', linkReplace: 'A new choice replaces the current link.',
     linkPick: 'Pick a person from the list.', linkSame: 'This link already exists.',
+    pushOn: 'Turn on notifications', pushOff: 'Turn off', pushIsOn: 'New suggestions are announced on this device.',
+    pushDenied: 'Notifications are blocked in the browser settings.', pushIos: 'For notifications on iPhone: Share → Add to Home Screen, then open the site from there.',
     kinNone: 'no children recorded', kinHint: 'Check the ancestors and children: many people share the same name.',
     welcomeTitle: 'Welcome to the family tree', welcomeLede: 'We build this tree together. Here’s what you can do:', gotIt: 'Got it',
     tipEditT: 'Suggest a change', tipEdit: (a, b) => `On any person, click ${a} to correct or add details, or ${b}. Changes appear once an editor approves them.`,
@@ -581,6 +594,8 @@ const T = {
     linkLedeAdmin: 'Vous êtes connecté en tant qu’éditeur : le lien est ajouté immédiatement.',
     linkFind: 'Prénom, nom, lieu ou année du conjoint', linkReplace: 'Un nouveau choix remplace le lien actuel.',
     linkPick: 'Choisissez une personne dans la liste.', linkSame: 'Ce lien existe déjà.',
+    pushOn: 'Activer les notifications', pushOff: 'Désactiver', pushIsOn: 'Les nouvelles propositions sont signalées sur cet appareil.',
+    pushDenied: 'Les notifications sont bloquées dans les réglages du navigateur.', pushIos: 'Pour les notifications sur iPhone : Partager → Sur l’écran d’accueil, puis ouvrez le site depuis là.',
     kinNone: 'aucun enfant enregistré', kinHint: 'Vérifiez les ancêtres et les enfants : beaucoup de personnes portent le même nom.',
     welcomeTitle: 'Bienvenue dans l’arbre généalogique', welcomeLede: 'Nous construisons cet arbre ensemble. Voici ce que vous pouvez faire :', gotIt: 'Compris',
     tipEditT: 'Proposer une modification', tipEdit: (a, b) => `Sur chaque personne, cliquez sur ${a} pour corriger ou compléter les informations, ou sur ${b}. Les modifications apparaissent une fois approuvées par un éditeur.`,
@@ -645,6 +660,8 @@ const T = {
     linkLedeAdmin: 'Sie sind als Redakteur angemeldet: Die Verknüpfung wird sofort hinzugefügt.',
     linkFind: 'Vorname, Nachname, Ort oder Jahr des Ehepartners', linkReplace: 'Eine neue Auswahl ersetzt die aktuelle Verknüpfung.',
     linkPick: 'Wählen Sie eine Person aus der Liste.', linkSame: 'Diese Verknüpfung gibt es schon.',
+    pushOn: 'Benachrichtigungen einschalten', pushOff: 'Ausschalten', pushIsOn: 'Neue Vorschläge werden auf diesem Gerät gemeldet.',
+    pushDenied: 'Benachrichtigungen sind in den Browser-Einstellungen blockiert.', pushIos: 'Für Benachrichtigungen auf dem iPhone: Teilen → Zum Home-Bildschirm, dann die Seite von dort öffnen.',
     kinNone: 'keine Kinder eingetragen', kinHint: 'Prüfen Sie Vorfahren und Kinder: Viele Personen haben denselben Namen.',
     welcomeTitle: 'Willkommen im Stammbaum', welcomeLede: 'Wir bauen diesen Stammbaum gemeinsam. Das können Sie tun:', gotIt: 'Verstanden',
     tipEditT: 'Änderung vorschlagen', tipEdit: (a, b) => `Klicken Sie bei jeder Person auf ${a}, um Angaben zu berichtigen oder zu ergänzen, oder auf ${b}. Änderungen erscheinen, sobald ein Redakteur sie freigibt.`,
@@ -1518,12 +1535,15 @@ async function openReview() {
     <div class="dlg-h"><div><div class="eyebrow">${esc(CFG.short)}</div><h2>${esc(t('reviewTitle'))}</h2></div>${closeBtn}</div>
     ${error ? `<p class="msg err">${esc(t('failed') + errText(error))}</p>` : `<p class="dlg-lede" id="rvLede">${esc(list.length ? t('reviewLede')(list.length) : t('nothingPending'))}</p>`}
     <div class="queue">${list.map(card).join('')}</div>
-    <div class="dlg-f"><button type="button" class="btn" data-signout>${esc(t('signOut'))}</button><button type="button" class="btn" data-close>${esc(t('close'))}</button></div>
+    <div class="dlg-f"><div class="pushctl" id="pushCtl"></div><button type="button" class="btn" data-signout>${esc(t('signOut'))}</button><button type="button" class="btn" data-close>${esc(t('close'))}</button></div>
   </div>`;
+  push.fill(document.getElementById('pushCtl'));
   if (!dReview.open) dReview.showModal();
 }
 dReview.addEventListener('close', showAdded);
 dReview.addEventListener('click', async e => {
+  const pb = e.target.closest('[data-push]');
+  if (pb) { push.click(document.getElementById('pushCtl'), pb); return; }
   if (e.target.closest('[data-signout]')) {
     await sb.auth.signOut(); isAdmin = false;
     document.getElementById('bReview').hidden = true; dReview.close(); renderPanel(); return;
@@ -2452,7 +2472,7 @@ treebar.addEventListener('click', e => {
 /* ---------- boot ---------- */
 new ResizeObserver(resize).observe(stage);
 resize(); readColors(); renderChrome();
-const wantsAdmin = location.hash === '#admin';
+const wantsAdmin = location.hash === '#admin' || location.hash === '#review';
 const m = /^#p(\d+)$/.exec(location.hash);
 const g = /^#g(\d+)$/.exec(location.hash);
 if (m && people.has(+m[1])) select(people.get(+m[1]).node, { instant: true });
