@@ -201,6 +201,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .name em { font-style: italic; font-weight: 400; color: var(--muted); font-size: .8em; }
 .sub { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
 .sub .y { font-family: var(--f-mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+.sub .sx { color: var(--ink); font-size: 15.5px; line-height: 1; }
 .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .pill { font-size: 12px; font-weight: 500; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 8px 14px; margin: 0; }
@@ -1092,6 +1093,8 @@ function renderPanel() {
     const sibs = par ? par.kids.filter(k => k !== p) : [];
     const desc = p.size - 1;
     const bits = [];
+    // the sex symbol leads the line, before the birth year
+    const sx = p.sex === 'm' || p.sex === 'f' ? `<span class="sx" title="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}" aria-label="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}">${p.sex === 'f' ? '♀' : '♂'}FE0E</span> ` : '';
     if (p.god != null) bits.push(`${esc(t('born'))} <span class="y">${esc(yr(p.god))}</span>`);
     if (p.opis) bits.push(esc(p.opis));
     if (p.mesto) bits.push(esc(p.mesto));
@@ -1100,7 +1103,7 @@ function renderPanel() {
     for (const o of p.spouseOf) links.push(o);
     h += `<div class="eyebrow">${dot(p)}${esc(p.prez || t('unknown'))} · ${esc(t('gen')(p.gen))}</div>
       <div><h2 class="name">${fullName(p)}</h2>
-        ${bits.length ? `<p class="sub">${bits.join(' · ')}</p>` : ''}
+        ${bits.length || sx ? `<p class="sub">${sx}${bits.join(' · ')}</p>` : ''}
         <div class="pills">${desc ? `<span class="pill">${fmt(desc)} ${esc(t('descendants'))}</span>` : ''}${!par ? `<span class="pill">${esc(t('lineRoot'))}</span>` : ''}</div>
         <div class="acts"><button type="button" class="btn" data-act="edit"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"></path></svg>${esc(t('edit'))}</button><button type="button" class="btn" data-act="child"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>${esc(t('addChild'))}</button><button type="button" class="btn" data-act="link"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="5.8" cy="8.6" r="3.6"></circle><circle cx="10.2" cy="7.4" r="3.6"></circle></svg>${esc(t('linkSpouse'))}</button><button type="button" class="btn" data-act="print"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 14.6V8.4M8 8.4 4.6 5.4M8 8.4l3.4-3M8 8.4V4.2M8 11 5.2 9.4M6.4 14.6h3.2"></path><circle cx="4" cy="4.8" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="4.8" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="8" cy="3" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="4.6" cy="9" r="1.1" fill="currentColor" stroke="none"></circle></svg>${esc(t('pdf'))}</button>${isAdmin ? `<button type="button" class="btn danger" data-act="delete"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5"></path></svg>${esc(t('del'))}</button>` : ''}</div>
       </div>`;
