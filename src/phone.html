@@ -518,7 +518,7 @@ function viewPerson(p) {
   const sibs = p.par != null ? people.get(p.par).kids : (g || [p]);
   const k = sibs.indexOf(p), prev = sibs[k - 1], next = sibs[k + 1];
   // the sex symbol leads the line, before the birth year
-  const sx = p.sex === 'm' || p.sex === 'f' ? `<span class="sx" title="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}" aria-label="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}">${p.sex === 'f' ? '♀' : '♂'}FE0E</span> ` : '';
+  const sx = p.sex === 'm' || p.sex === 'f' ? `<span class="sx" title="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}" aria-label="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}">${p.sex === 'f' ? '♀' : '♂'}︎</span> ` : '';
   const bits = sx + [p.god != null ? `${esc(t('born'))} <b>${esc(yr(p.god))}</b>` : '', esc(p.opis), esc(p.mesto)].filter(Boolean).join(' · ');
   const facts = [];
   if (p.sup) facts.push([esc(t('spouse')), esc(p.sup)]);

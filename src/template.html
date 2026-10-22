@@ -1094,7 +1094,7 @@ function renderPanel() {
     const desc = p.size - 1;
     const bits = [];
     // the sex symbol leads the line, before the birth year
-    const sx = p.sex === 'm' || p.sex === 'f' ? `<span class="sx" title="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}" aria-label="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}">${p.sex === 'f' ? '♀' : '♂'}FE0E</span> ` : '';
+    const sx = p.sex === 'm' || p.sex === 'f' ? `<span class="sx" title="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}" aria-label="${esc(t(p.sex === 'f' ? 'sexF' : 'sexM'))}">${p.sex === 'f' ? '♀' : '♂'}︎</span> ` : '';
     if (p.god != null) bits.push(`${esc(t('born'))} <span class="y">${esc(yr(p.god))}</span>`);
     if (p.opis) bits.push(esc(p.opis));
     if (p.mesto) bits.push(esc(p.mesto));
