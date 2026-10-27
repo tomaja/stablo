@@ -22,10 +22,12 @@ export async function onRequestPost({ request, env }) {
   const s = await request.json();
   const subs = Array.isArray(s.subs) ? s.subs : [];
   const jwk = JSON.parse(env.VAPID_PRIVATE_JWK), text = message(s), gone = [];
+  // VAPID subject: the site's own address, which Supabase posted to (SITE_URL in .env)
+  const site = new URL(request.url).origin;
   let sent = 0;
   await Promise.all(subs.map(async sub => {
     try {
-      const r = await send(sub, text, jwk, 'https://rodoslov.pages.dev');
+      const r = await send(sub, text, jwk, site);
       if (r.status === 404 || r.status === 410) gone.push(sub.endpoint);
       else if (r.ok) sent++;
       else console.error('push', r.status, await r.text());

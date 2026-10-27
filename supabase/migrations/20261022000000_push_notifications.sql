@@ -2,7 +2,8 @@
 -- visitor is pushed to every device an editor turned notifications on for (part 2 has the trigger that does it).
 --
 -- Run in the SQL editor in this order, each as its own query (nothing highlighted):
---   1. supabase/.temp/notify_secret.sql   (stores the shared secret in the Vault; git-ignored, holds the secret)
+--   1. build/vault.sql   (written by `python build.py` from .env: stores the site's address and the shared secret in
+--                        the Vault; git-ignored, holds the secret)
 --   2. this file
 --   3. 20261022000100_push_notifications_functions.sql
 -- The parts are separate because the editor's "table without RLS" check cuts off function bodies that follow a
